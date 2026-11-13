@@ -1205,12 +1205,20 @@
 
       // PHASE 6: DEPLOYMENT
       {
+        id: "p6-0",
+        phase: "phase6",
+        title: "GitHub Repository Initialized & Pushed (main branch)",
+        desc: "Source code pushed to https://github.com/Aian24/azrentalguy with full Next.js project structure, public assets, and clean git history.",
+        priority: "high",
+        status: "done"
+      },
+      {
         id: "p6-1",
         phase: "phase6",
         title: "Vercel Staging Environment Deployment",
-        desc: "Connect Next.js project to Vercel, configure environment secrets, and verify staging build preview.",
+        desc: "Connect Next.js project to Vercel via GitHub repo https://github.com/Aian24/azrentalguy, configure environment secrets, and verify staging build preview.",
         priority: "high",
-        status: "pending"
+        status: "in-progress"
       },
       {
         id: "p6-2",
@@ -1249,7 +1257,7 @@
 
     // LOCAL STORAGE MANAGEMENT
     let tasks = [];
-    const STORAGE_KEY = "azrentalguy_tracker_tasks_v12";
+    const STORAGE_KEY = "azrentalguy_tracker_tasks_v13";
 
     function loadTasks() {
       const saved = localStorage.getItem(STORAGE_KEY);
