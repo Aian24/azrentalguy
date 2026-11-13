@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZ Rental Guy (J-Bone Industries) - Project Tracker</title>
+  <style>
+    /* SOLID COLORS ONLY - STRICTLY NO GRADIENTS */
+    :root {
+      --bg-main: #0B0F19;
+      --bg-card: #151D2F;
+      --bg-card-hover: #1A243B;
+      --bg-input: #0F172A;
+      --border-color: #2D3748;
+      --border-focus: #E5A919;
+
+      --brand-gold: #E5A919;
+      --brand-gold-hover: #CA8A04;
+      --brand-gold-text: #0B0F19;
+
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+
+      --status-done: #10B981;
+      --status-done-bg: #064E3B;
+      --status-wip: #3B82F6;
+      --status-wip-bg: #1E3A8A;
+      --status-pending: #64748B;
+      --status-pending-bg: #1E293B;
+      --status-alert: #EF4444;
+      --status-alert-bg: #7F1D1D;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    /* SOLID HEADER */
+    header {
+      background-color: #111827;
+      border-bottom: 2px solid var(--brand-gold);
+      padding: 20px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-badge {
+      background-color: var(--brand-gold);
+      color: var(--brand-gold-text);
+      font-weight: 900;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .brand-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.15s ease;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .btn-gold {
+      background-color: var(--brand-gold);
+      color: var(--brand-gold-text);
+      border-color: var(--brand-gold);
+    }
+
+    .btn-gold:hover {
+      background-color: var(--brand-gold-hover);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--bg-card);
+      border-color: var(--brand-gold);
+    }
+
+    /* MAIN CONTAINER */
+    main {
+      max-width: 1400px;
+      margin: 28px auto 0 auto;
+      padding: 0 24px;
+    }
+
+    /* METRIC STATS CARDS */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .metric-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric-card.gold-border {
+      border-left: 4px solid var(--brand-gold);
+    }
+
+    .metric-card.green-border {
+      border-left: 4px solid var(--status-done);
+    }
+
+    .metric-card.blue-border {
+      border-left: 4px solid var(--status-wip);
+    }
+
+    .metric-card.gray-border {
+      border-left: 4px solid var(--status-pending);
+    }
+
+    .metric-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .metric-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* PROGRESS BAR */
+    .progress-section {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 28px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .progress-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-main);
+    }
+
+    .progress-percentage {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--brand-gold);
+    }
+
+    .progress-track {
+      background-color: #0F172A;
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .progress-fill {
+      background-color: var(--brand-gold);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* NAVIGATION TABS */
+    .view-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .view-tab {
+      background-color: transparent;
+      color: var(--text-muted);
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .view-tab:hover {
+      color: var(--text-main);
+    }
+
+    .view-tab.active {
+      color: var(--brand-gold);
+      border-bottom-color: var(--brand-gold);
+    }
+
+    /* TOOLBAR CONTROLS */
+    .tracker-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .filter-btn:hover {
+      background-color: var(--bg-card-hover);
+      color: var(--text-main);
+    }
+
+    .filter-btn.active {
+      background-color: var(--brand-gold);
+      color: var(--brand-gold-text);
+      border-color: var(--brand-gold);
+    }
+
+    .search-input {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      width: 260px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--brand-gold);
+    }
+
+    /* PHASE ACCORDION CARDS */
+    .phase-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .phase-header {
+      background-color: #192238;
+      padding: 16px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      user-select: none;
+    }
+
+    .phase-header:hover {
+      background-color: #1F2A46;
+    }
+
+    .phase-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .phase-badge {
+      background-color: var(--brand-gold);
+      color: var(--brand-gold-text);
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .phase-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .phase-header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .phase-stat {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .toggle-arrow {
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+    }
+
+    .phase-card.collapsed .toggle-arrow {
+      transform: rotate(-90deg);
+    }
+
+    .phase-card.collapsed .task-list {
+      display: none;
+    }
+
+    /* TASK LIST ITEMS */
+    .task-list {
+      padding: 8px 0;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid #1E293B;
+      gap: 16px;
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-item:hover {
+      background-color: var(--bg-card-hover);
+    }
+
+    .task-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .task-checkbox {
+      margin-top: 4px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--brand-gold);
+      cursor: pointer;
+    }
+
+    .task-content h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .task-content p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .task-item.completed .task-content h4 {
+      text-decoration: line-through;
+      color: var(--text-dim);
+    }
+
+    .task-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-select {
+      background-color: var(--bg-input);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .status-select:focus {
+      outline: none;
+      border-color: var(--brand-gold);
+    }
+
+    .priority-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .priority-high {
+      background-color: var(--status-alert-bg);
+      color: #FCA5A5;
+      border: 1px solid #991B1B;
+    }
+
+    .priority-medium {
+      background-color: #3730A3;
+      color: #C7D2FE;
+      border: 1px solid #4338CA;
+    }
+
+    .priority-standard {
+      background-color: #1E293B;
+      color: #CBD5E1;
+      border: 1px solid #334155;
+    }
+
+    /* REFERENCE TABLES & PANELS */
+    .panel-container {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+
+    .panel-container h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background-color: #111827;
+      color: var(--brand-gold);
+      text-align: left;
+      padding: 12px;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border-color);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    tr:hover td {
+      background-color: var(--bg-card-hover);
+    }
+
+    .code-box {
+      background-color: #0A0D14;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      color: #E2E8F0;
+      overflow-x: auto;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-solid-gold {
+      background-color: var(--brand-gold);
+      color: #000;
+    }
+
+    .badge-solid-green {
+      background-color: var(--status-done);
+      color: #fff;
+    }
+
+    .badge-solid-blue {
+      background-color: #2563EB;
+      color: #fff;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .task-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .search-input {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- STICKY SOLID HEADER -->
+  <header>
+    <div class="header-container">
+      <div class="brand-title">
+        <span class="brand-badge">CAT / HEAVY SPEC</span>
+        <div class="brand-text">
+          <h1>AZ Rental Guy (J-Bone Industries)</h1>
+          <p>Lead Gen Engine & Rental Platform Implementation Hub | Staging: Vercel → Production: Plesk</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline" onclick="exportData()">Export Progress</button>
+        <button class="btn btn-outline" onclick="resetProgress()">Reset All</button>
+        <a href="PLAN.md" class="btn btn-gold" target="_blank">View PLAN.md</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN BODY -->
+  <main>
+    <!-- TOP METRICS -->
+    <div class="metrics-grid">
+      <div class="metric-card gold-border">
+        <div class="metric-label">Overall Completion</div>
+        <div class="metric-value" id="overall-percentage">0%</div>
+        <div class="metric-sub" id="overall-fraction">0 / 0 Tasks Finished</div>
+      </div>
+      <div class="metric-card green-border">
+        <div class="metric-label">Completed Tasks</div>
+        <div class="metric-value" id="count-done" style="color: var(--status-done);">0</div>
+        <div class="metric-sub">Verified & Ready</div>
+      </div>
+      <div class="metric-card blue-border">
+        <div class="metric-label">In Progress</div>
+        <div class="metric-value" id="count-wip" style="color: var(--status-wip);">0</div>
+        <div class="metric-sub">Active Engineering</div>
+      </div>
+      <div class="metric-card gray-border">
+        <div class="metric-label">Pending Backlog</div>
+        <div class="metric-value" id="count-pending" style="color: var(--text-muted);">0</div>
+        <div class="metric-sub">Upcoming Phases</div>
+      </div>
+    </div>
+
+    <!-- OVERALL PROGRESS BAR -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="progress-title">Build Milestone Velocity</span>
+        <span class="progress-percentage" id="bar-percentage-label">0% Complete</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="main-progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- VIEW TABS -->
+    <div class="view-tabs">
+      <button class="view-tab active" onclick="switchView('tasks-tab', this)">
+        <span>📋</span> Interactive Tasks & Sprints
+      </button>
+      <button class="view-tab" onclick="switchView('fleet-tab', this)">
+        <span>🚜</span> Equipment Fleet & Pricing Matrix
+      </button>
+      <button class="view-tab" onclick="switchView('tech-tab', this)">
+        <span>⚡</span> Tech Stack & Solid Design System
+      </button>
+      <button class="view-tab" onclick="switchView('deploy-tab', this)">
+        <span>🚀</span> Vercel Staging & Plesk Migration Guide
+      </button>
+    </div>
+
+    <!-- VIEW 1: INTERACTIVE TASKS -->
+    <div id="tasks-tab" class="view-content">
+      <div class="tracker-toolbar">
+        <div class="filter-group">
+          <button class="filter-btn active" onclick="filterPhase('all', this)">All Phases</button>
+          <button class="filter-btn" onclick="filterPhase('phase1', this)">Phase 1: Frontend</button>
+          <button class="filter-btn" onclick="filterPhase('phase2', this)">Phase 2: Pricing</button>
+          <button class="filter-btn" onclick="filterPhase('phase3', this)">Phase 3: Agreement</button>
+          <button class="filter-btn" onclick="filterPhase('phase4', this)">Phase 4: AI Bot</button>
+          <button class="filter-btn" onclick="filterPhase('phase5', this)">Phase 5: Admin CRM</button>
+          <button class="filter-btn" onclick="filterPhase('phase6', this)">Phase 6: Deployment</button>
+        </div>
+        <input type="text" id="task-search" class="search-input" placeholder="Search tasks, specs, APIs..."
+          oninput="handleSearch()">
+      </div>
+
+      <!-- TASK CARDS CONTAINER (RENDERED VIA JS) -->
+      <div id="phases-container"></div>
+    </div>
+
+    <!-- VIEW 2: EQUIPMENT FLEET & RATES -->
+    <div id="fleet-tab" class="view-content hidden">
+      <div class="panel-container">
+        <h3>Live Equipment Fleet & Rate Sheet (J-Bone Industries / azrentalguy.com)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Equipment Model</th>
+              <th>Category</th>
+              <th>Daily Rate</th>
+              <th>Weekly Rate</th>
+              <th>Monthly (4-Wk)</th>
+              <th>Included Hours</th>
+              <th>Overtime / Hr</th>
+              <th>Attachments / Specs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>CAT 259D3 Compact Track Loader</strong></td>
+              <td><span class="badge-pill badge-solid-gold">Heavy Machinery</span></td>
+              <td>$450 / day</td>
+              <td>$1,300 / wk</td>
+              <td>$3,150 / mo</td>
+              <td>8h/day, 40h/wk, 160h/mo</td>
+              <td>$75.00 / hr</td>
+              <td>74.3 hp Turbo Diesel, 8,987 lbs operating weight, rubber tracks</td>
+            </tr>
+            <tr>
+              <td><strong>2021 John Deere 4044M Tractor</strong></td>
+              <td><span class="badge-pill badge-solid-green">Utility Tractor</span></td>
+              <td>$300 / day</td>
+              <td>$1,000 / wk</td>
+              <td>$1,700 / mo</td>
+              <td>8h/day, 40h/wk, 160h/mo</td>
+              <td>$75.00 / hr</td>
+              <td>Loader bucket; Pallet Forks or Gannon Box Scraper (+$50/d, +$100/wk)</td>
+            </tr>
+            <tr>
+              <td><strong>Multi-Quip WT5C Water Trailer</strong></td>
+              <td><span class="badge-pill badge-solid-blue">Water / Dust Control</span></td>
+              <td>$150 / day</td>
+              <td>$450 / wk</td>
+              <td>$1,000 / mo</td>
+              <td>Unlimited</td>
+              <td>N/A</td>
+              <td>500-gal poly tank, Honda engine pump, front/rear spray bars, hose</td>
+            </tr>
+            <tr>
+              <td><strong>2025 Load Trail Gooseneck Trailer</strong></td>
+              <td><span class="badge-pill badge-solid-gold">Deckover Hauler</span></td>
+              <td>$175 / day</td>
+              <td>$700 / wk</td>
+              <td>$2,300 / mo</td>
+              <td>Unlimited</td>
+              <td>N/A</td>
+              <td>Monster flip-over ramps, dual 10,000 lb axles, gooseneck hitch</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div
+          style="margin-top: 24px; padding: 16px; background-color: #111827; border-left: 4px solid var(--brand-gold); border-radius: 4px;">
+          <h4 style="color: var(--brand-gold); font-size: 14px; margin-bottom: 6px;">Universal Rental Policy & Fee
+            Structure:</h4>
+          <ul style="font-size: 13px; color: var(--text-muted); margin-left: 20px; line-height: 1.8;">
+            <li><strong>Valley-Wide Delivery & Pickup:</strong> $150 flat delivery fee across Phoenix, Scottsdale, Cave
+              Creek, Mesa, Chandler, Gilbert, Glendale, Peoria, Surprise, and Buckeye.</li>
+            <li><strong>Security Deposit:</strong> $500 pre-authorization hold per machine, released upon undamaged and
+              clean check-in.</li>
+            <li><strong>Damage Waiver (Optional):</strong> 10% of base rental cost covers accidental machine damage with
+              zero deductible (excludes gross negligence/misuse).</li>
+            <li><strong>Rental Tax Rate:</strong> 8.6% (Maricopa County / Arizona equipment rental tax).</li>
+            <li><strong>Fuel & Cleaning Policy:</strong> Full-to-full return policy. Fuel billed at $8.00/gal if
+              unreplenished. Excessive concrete/mud incurs $150 cleaning wash fee.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: TECH STACK & SOLID DESIGN SYSTEM -->
+    <div id="tech-tab" class="view-content hidden">
+      <div class="panel-container">
+        <h3>Architecture & Design System (Strict Solid Theme: Zero Gradients)</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+          The system is engineered using modern Node.js full-stack conventions with Next.js 15 App Router, TypeScript,
+          and Tailwind CSS.
+          As requested by the client, <strong>no gradial colors or themes are used</strong>. Only clean, high-contrast,
+          heavy-equipment solid color surfaces.
+        </p>
+
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div
+            style="background-color: #111827; border: 1px solid var(--border-color); border-radius: 6px; padding: 16px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--brand-gold); text-transform: uppercase;">Solid
+              Gold (#E5A919)</div>
+            <div style="height: 36px; background-color: #E5A919; border-radius: 4px; margin: 8px 0;"></div>
+            <div style="font-size: 12px; color: var(--text-muted);">Primary buttons, key badges, machine rate accents.
+            </div>
+          </div>
+          <div
+            style="background-color: #111827; border: 1px solid var(--border-color); border-radius: 6px; padding: 16px;">
+            <div style="font-size: 12px; font-weight: 700; color: #F8FAFC; text-transform: uppercase;">Charcoal
+              (#0F172A)</div>
+            <div
+              style="height: 36px; background-color: #0F172A; border: 1px solid #334155; border-radius: 4px; margin: 8px 0;">
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted);">Solid dark canvas, headers, deep contrast
+              containers.</div>
+          </div>
+          <div
+            style="background-color: #111827; border: 1px solid var(--border-color); border-radius: 6px; padding: 16px;">
+            <div style="font-size: 12px; font-weight: 700; color: #10B981; text-transform: uppercase;">Emerald Green
+              (#10B981)</div>
+            <div style="height: 36px; background-color: #10B981; border-radius: 4px; margin: 8px 0;"></div>
+            <div style="font-size: 12px; color: var(--text-muted);">Machine available, signed agreements, positive
+              status.</div>
+          </div>
+          <div
+            style="background-color: #111827; border: 1px solid var(--border-color); border-radius: 6px; padding: 16px;">
+            <div style="font-size: 12px; font-weight: 700; color: #3B82F6; text-transform: uppercase;">Arizona Blue
+              (#2563EB)</div>
+            <div style="height: 36px; background-color: #2563EB; border-radius: 4px; margin: 8px 0;"></div>
+            <div style="font-size: 12px; color: var(--text-muted);">Arizona 811 disclosures, informational callouts,
+              permit data.</div>
+          </div>
+        </div>
+
+        <h4 style="font-size: 15px; margin-bottom: 8px; color: var(--text-main);">Project Structure Overview</h4>
+        <div class="code-box">
+          azrentalguy/
+          ├── app/
+          │ ├── layout.tsx # Root Layout (Solid theme, metadata, SEO schema)
+          │ ├── page.tsx # High-conversion Homepage & Fleet Catalog
+          │ ├── quote/page.tsx # Real-time quote engine & duration optimizer
+          │ ├── reserve/page.tsx # 48-hour hold reservation checkout
+          │ ├── agreement/[id]/page.tsx # Arizona mobile-first digital signing pad
+          │ ├── admin/ # J-Bone Operator CRM & Dispatch Dashboard
+          │ │ ├── page.tsx # Today's operational dispatch & holds
+          │ │ ├── pipeline/page.tsx # Leads Kanban & follow-up generator
+          │ │ ├── calendar/page.tsx # Unit timeline & booking tracker
+          │ │ └── permits/page.tsx # Maricopa permit scraper & AI outreach
+          │ └── api/
+          │ ├── quote/route.ts # Multi-tier cheapest rate calculator
+          │ ├── chat/route.ts # AI Rental Assistant stream handler
+          │ └── agreement/route.ts # SHA-256 seal & PDF contract archiver
+          ├── components/
+          │ ├── Header.tsx # Click-to-call (707) 326-5592, nav links
+          │ ├── EquipmentCard.tsx # Specs, hour caps, instant reserve modal
+          │ ├── SignaturePad.tsx # HTML5 touch signature pad
+          │ ├── AIChatWidget.tsx # 24/7 lead assistant with quote button
+          │ └── ServiceAreaMap.tsx # Valley-wide delivery area map & zip checker
+          ├── lib/
+          │ ├── pricing.ts # Mathematical rate optimization engine
+          │ ├── disclosures.ts # AZ 811 & DOT trailer compliance text
+          │ └── db.ts # SQLite / PostgreSQL database client
+          └── package.json # Next.js 15, React 19, TypeScript, Tailwind
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: VERCEL & PLESK DEPLOYMENT GUIDE -->
+    <div id="deploy-tab" class="view-content hidden">
+      <div class="panel-container">
+        <h3>Deployment Architecture: Vercel Staging to Plesk Production</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+          Seamless two-stage delivery pipeline: instant automated staging previews on Vercel for rapid feedback,
+          followed by hardened deployment on Plesk.
+        </p>
+
+        <h4 style="color: var(--brand-gold); margin-bottom: 10px;">Stage 1: Vercel Staging Deployment</h4>
+        <ol style="margin-left: 20px; font-size: 13px; color: var(--text-main); line-height: 2;">
+          <li>Push project repository to GitHub (e.g. <code>github.com/your-org/azrentalguy</code>).</li>
+          <li>Import repo in <strong>Vercel Dashboard</strong>. Vercel automatically detects Next.js 15.</li>
+          <li>Set Environment Variables in Vercel project settings:
+            <div class="code-box">
+              NEXT_PUBLIC_BUSINESS_NAME="J-Bone Industries LLC"
+              NEXT_PUBLIC_PHONE="(707) 326-5592"
+              NEXT_PUBLIC_EMAIL="jbone@azrentalguy.com"
+              NEXT_PUBLIC_TAX_RATE="0.086"
+              DATABASE_URL="file:./azrentalguy.db" # or Supabase/Postgres connection string
+              AI_GATEWAY_API_KEY="your-api-key"
+              ADMIN_ACCESS_PIN="secure-pin-code"
+            </div>
+          </li>
+          <li>Deploy to obtain staging URL (e.g. <code>https://azrentalguy-staging.vercel.app</code>) for live review.
+          </li>
+        </ol>
+
+        <h4 style="color: var(--brand-gold); margin-top: 24px; margin-bottom: 10px;">Stage 2: Plesk Production
+          Deployment (azrentalguy.com)</h4>
+        <ol style="margin-left: 20px; font-size: 13px; color: var(--text-main); line-height: 2;">
+          <li>Log in to the Plesk Hosting Panel for <strong>azrentalguy.com</strong>.</li>
+          <li>Under <strong>Websites & Domains</strong>, select <strong>Node.js</strong> (supported natively in Plesk
+            Obsidian).</li>
+          <li>Set <strong>Node.js Version:</strong> <code>v20.x</code> or <code>v22.x</code>.</li>
+          <li>Set <strong>Application Mode:</strong> <code>production</code>.</li>
+          <li>Set <strong>Application Root:</strong> <code>/httpdocs</code> or <code>/httpdocs/azrentalguy</code>.</li>
+          <li>Set <strong>Application Startup File:</strong> <code>server.js</code> (Next.js standalone server) or
+            <code>node_modules/next/dist/bin/next</code> with argument <code>start</code>.</li>
+          <li>Run <code>npm run build</code> inside Plesk SSH or Web Terminal.</li>
+          <li>Point domain DNS records or enable the Node.js application proxy. Plesk automatically manages the Let's
+            Encrypt SSL certificate.</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // INITIAL MASTER TASK DATA
+    const INITIAL_TASKS = [
+      // PHASE 1: FRONTEND
+      {
+        id: "p1-1",
+        phase: "phase1",
+        title: "Setup Pure White Theme & Red/Yellow Design Tokens",
+        desc: "Configure pure white background (#FFFFFF) with solid Red (#CA021E) and Yellow (#E5A919) buttons and cards. Strictly zero gradients.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-2",
+        phase: "phase1",
+        title: "Implement Real azrentalguy.com Navbar & Logo",
+        desc: "Use actual navbar links: Home, Equipment (#Equipment), Pricing (#Pricing), Book Now (#Booknow), Contact (#Contact), and real logo.webp.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-3",
+        phase: "phase1",
+        title: "Implement Hero Section with Interactive Multi-Angle Showcase",
+        desc: "Professional Equipment Rental hero with interactive angle selector (Front, Side, Rear, On Trailer) using real CAT 259D3 photos.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-4",
+        phase: "phase1",
+        title: "Dedicated Multi-Page Routes (/equipment, /pricing, /book-now, /contact)",
+        desc: "Built independent, dedicated pages for each navbar link with Next.js App Router, metadata, and custom headers.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-5",
+        phase: "phase1",
+        title: "Equipment Catalog Carousel & Real Machine Photos",
+        desc: "Interactive 'Our Equipment' carousel with multi-angle CAT 259D3 photos, John Deere 4044M, WT5C water trailer, and attachments.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-6",
+        phase: "phase1",
+        title: "Instant Quote & 48-Hour Reservation Hold Engine",
+        desc: "Dynamic pricing math engine, Arizona 811 statutory agreement checkbox, and instant reservation hold submission.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-7",
+        phase: "phase1",
+        title: "Text-Only Compact Page Heroes (Zero Images, Zero Badges)",
+        desc: "Removed all images and badges from page heroes per user request, keeping clean high-impact typography, subtitles, value pills, and CTA buttons.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-8",
+        phase: "phase1",
+        title: "Streamlined Equipment Catalog Card (High-Impact Essentials Only)",
+        desc: "Eliminated cluttered walls of text (long specs, ideal applications, attachment boxes). Retained only the vital 3-stat spec bar, rich filled 3-tier rates, and AZ 811 badge.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-9",
+        phase: "phase1",
+        title: "Display 3 Items Only for Equipment Switcher with Arrow Navigation",
+        desc: "Navigation displays exactly 3 equipment tabs dynamically to prevent compression and row-wrapping, with directional arrow icons on Previous (ChevronLeft) and Next (ChevronRight) buttons.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-10",
+        phase: "phase1",
+        title: "Clean Minimalist Hero (Badges Removed) & White Navigation Buttons",
+        desc: "Removed all value pill badges from hero sections for a clean minimalist aesthetic; Previous and Next buttons styled in clean white/transparent with dark directional chevrons; created dedicated public/images/equipments folder structure.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-11",
+        phase: "phase1",
+        title: "Pricing Cards White Typography & Static Concise FAQ Display",
+        desc: "All yellow pricing cards and 'Best Value' badges updated with high-contrast white typography; FAQs converted from clickable accordions into an open, scannable grid with concise 1-2 sentence answers.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-12",
+        phase: "phase1",
+        title: "Included 2021 Cat 226D3 Skid Steer & Fullscreen Image Lightbox",
+        desc: "Integrated the 2021 Cat 226D3 CA Skid Steer with 5 high-resolution photos, rates ($275/d, $1,000/w, $1,650/mo), and specs; added interactive full-screen image lightbox modal; removed border lines around equipment photos.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-13",
+        phase: "phase1",
+        title: "Soft-Tinted Cards Theme & White Checkmark Styling",
+        desc: "Replaced heavy saturated solid card backgrounds with soft-tinted cards (bg-red-50 and bg-yellow-50 with matching borders) matching the Value Props theme while preserving solid button colors; rendered crisp white checkmarks on damage waiver and options.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-14",
+        phase: "phase1",
+        title: "Header/Footer Cleanups, Edge-to-Edge Images, & Scroll-Up Animations",
+        desc: "Removed redundant Book Now button from navbar; removed Implementation Hub from footer (now 3-column layout); set CAT 226D3 image to full width object-cover; enabled bidirectional scroll-up/down animations; resolved price/details text-wrapping in Featured Fleet.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-15",
+        phase: "phase1",
+        title: "Modern Animated Scroll Down Indicator on Home Hero",
+        desc: "Replaced the old mouse icon on the homepage hero section with a modern animated ChevronDown scroll button with smooth scroll-to-target functionality.",
+        priority: "high",
+        status: "done"
+      },
+
+      // PHASE 2: PRICING ENGINE
+      {
+        id: "p2-1",
+        phase: "phase2",
+        title: "Mathematical Best-Rate Optimization Algorithm",
+        desc: "Compute cheapest combination of daily ($450), weekly ($1,300), and 4-week ($3,150) tiers automatically.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p2-2",
+        phase: "phase2",
+        title: "Add-On Fee Calculator (Delivery, Waiver, Attachments)",
+        desc: "Include $150 flat delivery, 10% optional damage waiver, and tractor attachments ($50/d, $100/w).",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p2-3",
+        phase: "phase2",
+        title: "Tax Engine & Security Deposit Logic",
+        desc: "Apply Arizona 8.6% Maricopa rental tax rate and $500 pre-authorization hold line item.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p2-4",
+        phase: "phase2",
+        title: "Interactive Real-Time Quote Calculator UI",
+        desc: "Date-picker with live cost recalculation, operating hour limit display, and PDF estimate downloader.",
+        priority: "medium",
+        status: "pending"
+      },
+
+      // PHASE 3: AGREEMENT
+      {
+        id: "p3-1",
+        phase: "phase3",
+        title: "48-Hour Reservation Hold Flow",
+        desc: "Customer reserves machine dates without upfront full charge; holds unit for 48 hours pending signature.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p3-2",
+        phase: "phase3",
+        title: "Arizona 811 Dig-Law Compliance Disclosure",
+        desc: "Mandatory statutory checkbox for excavators and track loaders (A.R.S. § 40-360.21 compliance).",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p3-3",
+        phase: "phase3",
+        title: "Trailer Towing & Hazardous Load Disclosures",
+        desc: "Vehicle GVWR verification checkbox and banned material restrictions (no asbestos, paints, chemicals).",
+        priority: "medium",
+        status: "pending"
+      },
+      {
+        id: "p3-4",
+        phase: "phase3",
+        title: "Mobile HTML5 Canvas Digital Signature Pad",
+        desc: "Touch-sensitive drawing canvas for smartphone signing with clear/redo and smooth bezier smoothing.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p3-5",
+        phase: "phase3",
+        title: "Cryptographic SHA-256 Audit Seal & Archival",
+        desc: "Freeze contract snapshot, client IP address, timestamp, and signature vector into tamper-proof SHA-256 hash.",
+        priority: "high",
+        status: "pending"
+      },
+
+      // PHASE 4: AI BOT
+      {
+        id: "p4-1",
+        phase: "phase4",
+        title: "24/7 AI Floating Rental Assistant Widget",
+        desc: "Industrial chat interface anchored to bottom-right corner with minimize/maximize and mobile responsiveness.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p4-2",
+        phase: "phase4",
+        title: "Machine Recommendation Natural Language Parser",
+        desc: "Understands job prompts ('need to grade 2 acres in Cave Creek') and recommends matching equipment.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p4-3",
+        phase: "phase4",
+        title: "Math-Locked Dynamic Pricing Integration",
+        desc: "Forces AI to query the pricing engine API; strictly prohibits LLM hallucination of rental numbers.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p4-4",
+        phase: "phase4",
+        title: "Lead Capture & CRM Instant Dispatch",
+        desc: "Gathers customer name, phone, email, and jobsite address; immediately notifies operator via SMS/Email.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p4-5",
+        phase: "phase4",
+        title: "1-Click 'Book These Dates' Checkout Pre-fill",
+        desc: "Injects dates, equipment selection, and customer contact directly into reservation modal.",
+        priority: "medium",
+        status: "pending"
+      },
+
+      // PHASE 5: ADMIN CRM
+      {
+        id: "p5-1",
+        phase: "phase5",
+        title: "Today's Dispatch & Active Holds Hub",
+        desc: "Live dashboard showing units heading out, returns due today, overdue alerts, and expiring 48-hr holds.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p5-2",
+        phase: "phase5",
+        title: "Lead Pipeline Kanban & Phone-In Entry Form",
+        desc: "Manage pipeline stages: Inquired, Quoted, Agreement Sent, Reserved, Active, Closed. Quick phone-in lead entry.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p5-3",
+        phase: "phase5",
+        title: "Fleet Booking Calendar & Unit Timeline",
+        desc: "Visual Gantt-style timeline showing equipment utilization, maintenance holds, and availability gaps.",
+        priority: "medium",
+        status: "pending"
+      },
+      {
+        id: "p5-4",
+        phase: "phase5",
+        title: "Maricopa County Permit Pipeline & AI Outreach",
+        desc: "CSV upload of county permits; AI scores equipment needs and drafts personalized SMS/email pitches.",
+        priority: "medium",
+        status: "pending"
+      },
+      {
+        id: "p5-5",
+        phase: "phase5",
+        title: "Google Review Automated Follow-Up Engine",
+        desc: "Queues SMS review request 24 hours after machine return with 1-click Google Business review link.",
+        priority: "standard",
+        status: "pending"
+      },
+
+      // PHASE 6: DEPLOYMENT
+      {
+        id: "p6-1",
+        phase: "phase6",
+        title: "Vercel Staging Environment Deployment",
+        desc: "Connect Next.js project to Vercel, configure environment secrets, and verify staging build preview.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p6-2",
+        phase: "phase6",
+        title: "End-to-End Rental Booking Test on Staging",
+        desc: "Execute complete rental test: AI lead inquiry → Quote calculation → 48-hr Hold → Mobile Agreement Signature.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p6-3",
+        phase: "phase6",
+        title: "Plesk Node.js / Passenger Production Configuration",
+        desc: "Configure Plesk Obsidian Node.js application manager, environment secrets, and PM2/Passenger startup file.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p6-4",
+        phase: "phase6",
+        title: "SSL Certificate & Domain Cutover to azrentalguy.com",
+        desc: "Verify DNS records, test HTTPS certificates, verify mobile responsiveness, and perform zero-downtime cutover.",
+        priority: "high",
+        status: "pending"
+      }
+    ];
+
+    const PHASE_METADATA = {
+      phase1: { name: "Phase 1: High-Conversion Frontend & Catalog UI", badge: "Frontend" },
+      phase2: { name: "Phase 2: Instant Pricing & Optimization Engine", badge: "Engine" },
+      phase3: { name: "Phase 3: Arizona Digital Agreement & Signature Flow", badge: "Legal / Flow" },
+      phase4: { name: "Phase 4: 24/7 AI Rental Assistant & Lead Generator", badge: "AI Automation" },
+      phase5: { name: "Phase 5: Operator CRM & Dispatch Dashboard", badge: "Admin / Ops" },
+      phase6: { name: "Phase 6: Vercel Staging & Plesk Production Cutover", badge: "DevOps" }
+    };
+
+    // LOCAL STORAGE MANAGEMENT
+    let tasks = [];
+    const STORAGE_KEY = "azrentalguy_tracker_tasks_v12";
+
+    function loadTasks() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          tasks = JSON.parse(saved);
+        } catch (e) {
+          tasks = [...INITIAL_TASKS];
+        }
+      } else {
+        tasks = [...INITIAL_TASKS];
+      }
+    }
+
+    function saveTasks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      renderDashboard();
+    }
+
+    function resetProgress() {
+      if (confirm("Reset all task progress to initial defaults?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        tasks = [...INITIAL_TASKS];
+        saveTasks();
+      }
+    }
+
+    function exportData() {
+      const json = JSON.stringify(tasks, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "azrentalguy-project-progress.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    let activePhaseFilter = "all";
+    let searchQuery = "";
+
+    function filterPhase(phaseId, btn) {
+      activePhaseFilter = phaseId;
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderPhases();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById("task-search").value.toLowerCase().trim();
+      renderPhases();
+    }
+
+    function toggleTask(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+      task.status = task.status === "done" ? "pending" : "done";
+      saveTasks();
+    }
+
+    function setTaskStatus(taskId, newStatus) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+      task.status = newStatus;
+      saveTasks();
+    }
+
+    function togglePhaseCard(headerEl) {
+      const card = headerEl.closest(".phase-card");
+      card.classList.toggle("collapsed");
+    }
+
+    function switchView(viewId, tabBtn) {
+      document.querySelectorAll(".view-content").forEach(el => el.classList.add("hidden"));
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.getElementById(viewId).classList.remove("hidden");
+      tabBtn.classList.add("active");
+    }
+
+    // RENDER FUNCTIONS
+    function renderDashboard() {
+      const total = tasks.length;
+      const doneCount = tasks.filter(t => t.status === "done").length;
+      const wipCount = tasks.filter(t => t.status === "in-progress").length;
+      const pendingCount = tasks.filter(t => t.status === "pending").length;
+      const percentage = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+      document.getElementById("overall-percentage").innerText = percentage + "%";
+      document.getElementById("overall-fraction").innerText = `${doneCount} of ${total} Tasks Finished`;
+      document.getElementById("count-done").innerText = doneCount;
+      document.getElementById("count-wip").innerText = wipCount;
+      document.getElementById("count-pending").innerText = pendingCount;
+      document.getElementById("bar-percentage-label").innerText = percentage + "% Complete";
+      document.getElementById("main-progress-bar").style.width = percentage + "%";
+
+      renderPhases();
+    }
+
+    function renderPhases() {
+      const container = document.getElementById("phases-container");
+      container.innerHTML = "";
+
+      const phaseKeys = ["phase1", "phase2", "phase3", "phase4", "phase5", "phase6"];
+
+      phaseKeys.forEach(phaseKey => {
+        if (activePhaseFilter !== "all" && activePhaseFilter !== phaseKey) {
+          return;
+        }
+
+        let phaseTasks = tasks.filter(t => t.phase === phaseKey);
+        if (searchQuery) {
+          phaseTasks = phaseTasks.filter(t =>
+            t.title.toLowerCase().includes(searchQuery) ||
+            t.desc.toLowerCase().includes(searchQuery)
+          );
+        }
+
+        if (phaseTasks.length === 0 && searchQuery) return;
+
+        const meta = PHASE_METADATA[phaseKey];
+        const allPhaseTasks = tasks.filter(t => t.phase === phaseKey);
+        const phaseDone = allPhaseTasks.filter(t => t.status === "done").length;
+        const phaseTotal = allPhaseTasks.length;
+
+        const card = document.createElement("div");
+        card.className = "phase-card";
+
+        card.innerHTML = `
+          <div class="phase-header" onclick="togglePhaseCard(this)">
+            <div class="phase-header-left">
+              <span class="phase-badge">${meta.badge}</span>
+              <span class="phase-name">${meta.name}</span>
+            </div>
+            <div class="phase-header-right">
+              <span class="phase-stat">${phaseDone}/${phaseTotal} Done</span>
+              <span class="toggle-arrow">▼</span>
+            </div>
+          </div>
+          <div class="task-list" id="list-${phaseKey}"></div>
+        `;
+
+        const listContainer = card.querySelector(`#list-${phaseKey}`);
+
+        phaseTasks.forEach(task => {
+          const item = document.createElement("div");
+          item.className = `task-item ${task.status === "done" ? "completed" : ""}`;
+
+          item.innerHTML = `
+            <div class="task-left">
+              <input type="checkbox" class="task-checkbox" ${task.status === "done" ? "checked" : ""} onchange="toggleTask('${task.id}')">
+              <div class="task-content">
+                <h4>${task.title}</h4>
+                <p>${task.desc}</p>
+              </div>
+            </div>
+            <div class="task-right">
+              <span class="priority-badge priority-${task.priority}">${task.priority}</span>
+              <select class="status-select" onchange="setTaskStatus('${task.id}', this.value)">
+                <option value="pending" ${task.status === "pending" ? "selected" : ""}>Pending</option>
+                <option value="in-progress" ${task.status === "in-progress" ? "selected" : ""}>In Progress</option>
+                <option value="done" ${task.status === "done" ? "selected" : ""}>Done</option>
+              </select>
+            </div>
+          `;
+          listContainer.appendChild(item);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // INITIALIZE ON LOAD
+    window.addEventListener("DOMContentLoaded", () => {
+      loadTasks();
+      renderDashboard();
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,185 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { FLEET } from "@/lib/fleet";
+import { Truck, Clock, ShieldCheck, Wrench, Calendar, CalendarCheck } from "lucide-react";
+import ScrollReveal from "@/components/ScrollReveal";
+
+export default function HomeOverview() {
+  const advantages = [
+    {
+      icon: <Truck className="w-6 h-6 text-white" />,
+      iconBg: "bg-red-600",
+      cardBg: "bg-red-50 border-2 border-red-200",
+      title: "$150 Flat Valley Delivery",
+      desc: "Delivered direct to your jobsite anywhere in Maricopa County. Pickup included.",
+    },
+    {
+      icon: <Clock className="w-6 h-6 text-gray-950" />,
+      iconBg: "bg-[#E5A919]",
+      cardBg: "bg-yellow-50 border-2 border-yellow-200",
+      title: "48-Hour Free Hold",
+      desc: "Lock in machine availability online without paying full fees up front.",
+    },
+    {
+      icon: <Wrench className="w-6 h-6 text-white" />,
+      iconBg: "bg-red-600",
+      cardBg: "bg-red-50 border-2 border-red-200",
+      title: "Maintained Heavy Fleet",
+      desc: "Low-hour CAT and John Deere machinery thoroughly inspected and fueled.",
+    },
+    {
+      icon: <ShieldCheck className="w-6 h-6 text-gray-950" />,
+      iconBg: "bg-[#E5A919]",
+      cardBg: "bg-yellow-50 border-2 border-yellow-200",
+      title: "Arizona 811 Compliant",
+      desc: "Paperless digital agreements signed from your phone in under 60 seconds.",
+    },
+  ];
+
+  return (
+    <div id="overview" className="bg-white">
+      {/* 1. WHY CONTRACTORS CHOOSE US */}
+      <section className="py-12 sm:py-16 border-b border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ScrollReveal className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-950 tracking-tight">
+              Built for Arizona Contractors &amp; Homeowners
+            </h2>
+            <p className="mt-2 text-sm sm:text-base text-gray-600 font-medium">
+              We eliminate equipment rental headaches with guaranteed upfront rates, flat delivery, and fast turnaround.
+            </p>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {advantages.map((adv, idx) => (
+              <ScrollReveal key={idx} delay={idx * 100}>
+                <div className={`rounded-3xl p-6 ${adv.cardBg} shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group`}>
+                  <div>
+                    <div className={`w-12 h-12 rounded-2xl ${adv.iconBg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm`}>
+                      {adv.icon}
+                    </div>
+                    <h3 className="text-base font-black text-gray-950 mb-1.5">{adv.title}</h3>
+                    <p className="text-xs text-gray-700 leading-relaxed font-medium">{adv.desc}</p>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 2. FEATURED FLEET PREVIEW (LINKS DIRECTLY TO /equipment) */}
+      <section id="featured-equipment" className="py-12 sm:py-16 border-b border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ScrollReveal className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-black text-gray-950 tracking-tight">
+                Featured Rental Fleet
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                Commercial track loaders, utility tractors, water trailers, and haulers.
+              </p>
+            </div>
+            <Link
+              href="/equipment"
+              className="btn-yellow px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider inline-flex items-center gap-2 self-start sm:self-auto shadow-sm hover:scale-105 transition-all"
+            >
+              <Truck className="w-4 h-4 text-gray-950" />
+              <span>View Full Fleet &amp; Specs</span>
+            </Link>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+            {FLEET.map((machine, idx) => (
+              <ScrollReveal key={machine.id} delay={idx * 80}>
+                <div className="rounded-3xl p-5 bg-slate-50 border-2 border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group">
+                  <div>
+                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 mb-4 flex items-center justify-center">
+                      <img
+                        src={
+                          machine.id === "cat-259d3"
+                            ? "/images/cat-ontrailer.webp"
+                            : machine.id === "cat-226d3"
+                            ? "/images/equipments/2021 Cat 226D3/1.jpg"
+                            : machine.id === "jd-4044m"
+                            ? "/images/jd-4044.webp"
+                            : machine.id === "wt5c"
+                            ? "/images/water-trailer.webp"
+                            : "/images/cat-ontrailer.webp"
+                        }
+                        alt={machine.name}
+                        className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <span className="absolute top-2.5 left-2.5 bg-red-600 text-white font-black text-[10px] uppercase px-2 py-0.5 rounded-lg shadow-sm">
+                        {machine.category}
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-black text-gray-950 leading-snug">
+                      {machine.name}
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-1 line-clamp-2 font-medium">
+                      {machine.tagline}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 p-2.5 sm:p-3 bg-yellow-50 border-2 border-yellow-200 rounded-2xl flex items-center justify-between gap-2 whitespace-nowrap">
+                    <div className="flex items-baseline shrink-0 whitespace-nowrap leading-none">
+                      <span className="text-lg sm:text-xl font-black text-gray-950">${machine.dailyRate}</span>
+                      <span className="text-[11px] font-bold text-gray-600 ml-1">/day</span>
+                    </div>
+                    <Link
+                      href="/equipment"
+                      className="btn-red px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider inline-flex items-center justify-center shrink-0 whitespace-nowrap shadow-xs"
+                    >
+                      <span>Details</span>
+                    </Link>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. CTA BANNER (RED-50 CARD THEME) */}
+      <section className="py-12 sm:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <div className="rounded-3xl p-8 sm:p-12 bg-red-50 border-2 border-red-200 text-gray-950 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-sm">
+              <div className="max-w-xl text-center lg:text-left">
+                <span className="text-xs font-black uppercase tracking-widest text-red-600 mb-2 inline-block">
+                  Fast Arizona Jobsite Dispatch
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-black tracking-tight mt-1 text-gray-950">
+                  Ready to Reserve Your Equipment?
+                </h2>
+                <p className="text-sm sm:text-base text-gray-700 mt-2 font-medium">
+                  Put a 48-hour hold on your machine dates online or call our dispatch team directly for prompt jobsite delivery.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3.5 shrink-0 justify-center">
+                <Link
+                  href="/book-now"
+                  className="btn-red px-7 py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider inline-flex items-center gap-2 shadow-md hover:scale-105 transition-all cursor-pointer"
+                >
+                  <Calendar className="w-4 h-4 text-white" />
+                  <span>Book Equipment Now</span>
+                </Link>
+                <Link
+                  href="/contact"
+                  className="btn-yellow px-7 py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider inline-flex items-center gap-2 shadow-md hover:scale-105 transition-all text-gray-950 cursor-pointer"
+                >
+                  <span>Contact Dispatch</span>
+                </Link>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+    </div>
+  );
+}

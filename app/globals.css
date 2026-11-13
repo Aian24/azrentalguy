@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* PURE WHITE BACKGROUND - ZERO GRADIENTS - RED & YELLOW SOLID ACCENTS ONLY */
+:root {
+  --background: #FFFFFF;
+  --foreground: #111827;
+  --brand-yellow: #E5A919;
+  --brand-yellow-hover: #CA8A04;
+  --brand-red: #CA021E;
+  --brand-red-hover: #A60218;
+}
+
+body {
+  color: #111827;
+  background-color: #FFFFFF;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* CUSTOM SOLID RED & YELLOW BUTTONS */
+.btn-yellow {
+  background-color: #E5A919;
+  color: #111827;
+  font-weight: 800;
+  border: 2px solid #E5A919;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-yellow:hover {
+  background-color: #CA8A04;
+  border-color: #CA8A04;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(229, 169, 25, 0.35);
+}
+
+.btn-red {
+  background-color: #CA021E;
+  color: #FFFFFF;
+  font-weight: 800;
+  border: 2px solid #CA021E;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-red:hover {
+  background-color: #A60218;
+  border-color: #A60218;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(202, 2, 30, 0.35);
+}
+
+.btn-yellow-outline {
+  background-color: #FFFFFF;
+  color: #B45309;
+  font-weight: 800;
+  border: 2px solid #E5A919;
+  transition: all 0.2s ease;
+}
+
+.btn-yellow-outline:hover {
+  background-color: #FEF3C7;
+  border-color: #CA8A04;
+  color: #92400E;
+}
+
+.btn-red-outline {
+  background-color: #FFFFFF;
+  color: #CA021E;
+  font-weight: 800;
+  border: 2px solid #CA021E;
+  transition: all 0.2s ease;
+}
+
+.btn-red-outline:hover {
+  background-color: #FEE2E2;
+  border-color: #A60218;
+  color: #A60218;
+}
+
+/* CARDS WITH RED & YELLOW ACCENTS ON WHITE BACKGROUND */
+.card-yellow {
+  background-color: #FFFFFF;
+  border: 2px solid #E5A919;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+.card-yellow:hover {
+  border-color: #CA8A04;
+  box-shadow: 0 12px 24px -6px rgba(229, 169, 25, 0.2);
+  transform: translateY(-3px);
+}
+
+.card-red {
+  background-color: #FFFFFF;
+  border: 2px solid #CA021E;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+.card-red:hover {
+  border-color: #A60218;
+  box-shadow: 0 12px 24px -6px rgba(202, 2, 30, 0.2);
+  transform: translateY(-3px);
+}
+
+/* ANIMATIONS */
+@keyframes pulseSubtle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2.5s infinite ease-in-out;
+}
+
+/* SMOOTH SCROLLING */
+html {
+  scroll-behavior: smooth;
+}
