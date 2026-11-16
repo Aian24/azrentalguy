@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { FLEET, COMPANY_INFO } from "@/lib/fleet";
-import { Calendar, ShieldAlert, CheckCircle, Truck, Phone, ShieldCheck, Check } from "lucide-react";
+import { calculateQuote } from "@/lib/pricing";
+import { Calendar, ShieldAlert, CheckCircle, Truck, Phone, ShieldCheck, Check, Tag } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function BookingSection() {
@@ -29,46 +30,37 @@ export default function BookingSection() {
 
     setStartDate(today.toISOString().split("T")[0]);
     setEndDate(tomorrow.toISOString().split("T")[0]);
+
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const eqParam = params.get("equipment");
+      if (eqParam && FLEET.some((m) => m.id === eqParam)) {
+        setSelectedMachineId(eqParam);
+      }
+    }
   }, []);
 
   const machine = FLEET.find((m) => m.id === selectedMachineId) || FLEET[0];
 
-  // Pricing calculations
-  let days = 1;
-  if (startDate && endDate) {
-    const s = new Date(startDate);
-    const e = new Date(endDate);
-    const diff = e.getTime() - s.getTime();
-    days = Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1);
-  }
+  // Dynamic calculations via master pricing engine
+  const quote = calculateQuote({
+    equipmentId: selectedMachineId,
+    startDate,
+    endDate,
+    deliveryIncluded,
+    damageWaiver,
+    withAttachment,
+    zipCode: address,
+  });
 
-  // Best-rate tier calculation
-  const fourWeeks = Math.floor(days / 28);
-  const remDays1 = days % 28;
-  const weeks = Math.floor(remDays1 / 7);
-  const remDays2 = remDays1 % 7;
-
-  const optimizedCost =
-    fourWeeks * machine.monthlyRate + weeks * machine.weeklyRate + remDays2 * machine.dailyRate;
-  const pureDailyCost = days * machine.dailyRate;
-  const baseCost = Math.min(optimizedCost, pureDailyCost);
-
-  // Attachments
-  let attachCost = 0;
-  if (withAttachment && machine.availableAttachments) {
-    attachCost = days >= 7 ? Math.ceil(days / 7) * 100 : days * 50;
-  }
-
-  // Delivery
-  const deliveryFee = deliveryIncluded ? 150 : 0;
-
-  // Damage Waiver
-  const waiverFee = damageWaiver ? 0.1 * (baseCost + attachCost) : 0;
-
-  // Subtotal & Tax
-  const subtotal = baseCost + attachCost + deliveryFee + waiverFee;
-  const tax = subtotal * COMPANY_INFO.taxRate;
-  const grandTotal = subtotal + tax;
+  const days = quote.rentalPeriod.days;
+  const baseCost = quote.costs.baseRental;
+  const attachCost = quote.costs.attachments;
+  const deliveryFee = quote.costs.delivery;
+  const waiverFee = quote.costs.damageWaiver;
+  const subtotal = quote.costs.subtotal;
+  const tax = quote.costs.taxAmount;
+  const grandTotal = quote.costs.totalDue;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -465,9 +457,19 @@ export default function BookingSection() {
 
                 {/* ITEMIZED BREAKDOWN (SLATE-50 CARD) */}
                 <div className="bg-slate-50 border-2 border-slate-200 p-4 rounded-2xl space-y-2.5 text-xs">
+                  {quote.costs.savings > 0 && (
+                    <div className="bg-emerald-50 border border-emerald-300 text-emerald-950 p-2.5 rounded-xl text-xs font-bold flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Tag className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>Best Rate Applied:</span>
+                      </div>
+                      <span className="text-emerald-700 font-black">-${quote.costs.savings.toFixed(2)} Saved</span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between py-1 border-b border-gray-200">
                     <span className="text-gray-500 font-semibold">Included Operating Hours:</span>
-                    <strong className="text-gray-950 font-black">{machine.includedHours}</strong>
+                    <strong className="text-gray-950 font-black">{quote.operations.includedHours}</strong>
                   </div>
                   <div className="flex justify-between py-1 border-b border-gray-200">
                     <span className="text-gray-500 font-semibold">Optimized Rental Rate:</span>

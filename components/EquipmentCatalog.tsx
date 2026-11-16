@@ -120,6 +120,7 @@ export default function EquipmentCatalog() {
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedTier, setSelectedTier] = useState<"daily" | "weekly" | "monthly">("weekly");
   const [selectedImgIndex, setSelectedImgIndex] = useState<{ [key: string]: number }>({
     "cat-259d3": 0,
     "cat-226d3": 0,
@@ -246,8 +247,8 @@ export default function EquipmentCatalog() {
                     <Maximize2 className="w-4 h-4 text-white" />
                   </button>
 
-                  <div className="absolute bottom-3 right-3 bg-[#E5A919] text-white font-black text-xs uppercase px-3 py-1 rounded-lg shadow-md pointer-events-none">
-                    ${currentMachine.daily} / Day
+                  <div className="absolute bottom-3 right-3 bg-[#E5A919] text-white font-black text-xs uppercase px-3 py-1.5 rounded-xl shadow-md pointer-events-none transition-all">
+                    ${selectedTier === "daily" ? `${currentMachine.daily} / Day` : selectedTier === "weekly" ? `${currentMachine.weekly} / Week` : `${currentMachine.monthly} / 4-Week`}
                   </div>
                 </div>
 
@@ -312,29 +313,53 @@ export default function EquipmentCatalog() {
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-2.5 text-center">
-                    {/* DAILY (NEUTRAL CARD) */}
-                    <div className="bg-white border-2 border-slate-200 p-2.5 rounded-2xl shadow-xs">
+                    {/* DAILY (INTERACTIVE BUTTON CARD) */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTier("daily")}
+                      className={`p-2.5 rounded-2xl transition-all cursor-pointer text-center ${
+                        selectedTier === "daily"
+                          ? "bg-white border-2 border-red-600 ring-2 ring-red-500/20 shadow-md scale-102"
+                          : "bg-white border-2 border-slate-200 hover:border-slate-400 opacity-80 hover:opacity-100 shadow-2xs"
+                      }`}
+                    >
                       <div className="text-[10px] font-black text-gray-500 uppercase">Daily</div>
                       <div className="text-xl sm:text-2xl font-black text-gray-950 mt-0.5">${currentMachine.daily}</div>
                       <div className="text-[10px] text-gray-500 font-bold">Includes 8h</div>
-                    </div>
+                    </button>
 
-                    {/* WEEKLY (RED-50 CARD WITH RED-200 BORDER) */}
-                    <div className="bg-red-50 border-2 border-red-200 p-2.5 rounded-2xl shadow-xs relative">
+                    {/* WEEKLY (INTERACTIVE BUTTON CARD - RED-50) */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTier("weekly")}
+                      className={`p-2.5 rounded-2xl transition-all cursor-pointer text-center relative ${
+                        selectedTier === "weekly"
+                          ? "bg-red-50 border-2 border-red-600 ring-2 ring-red-500/20 shadow-md scale-102"
+                          : "bg-red-50/70 border-2 border-red-200 hover:border-red-400 shadow-2xs opacity-85 hover:opacity-100"
+                      }`}
+                    >
                       <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-red-600 text-white font-black text-[9px] uppercase px-2 py-0.5 rounded-full whitespace-nowrap shadow-xs">
                         Best Value
                       </span>
                       <div className="text-[10px] font-black uppercase tracking-wider text-red-700">Weekly</div>
                       <div className="text-xl sm:text-2xl font-black text-gray-950 mt-0.5">${currentMachine.weekly}</div>
                       <div className="text-[10px] text-gray-600 font-bold">Includes 40h</div>
-                    </div>
+                    </button>
 
-                    {/* 4-WEEK (YELLOW-50 CARD WITH YELLOW-200 BORDER) */}
-                    <div className="bg-yellow-50 border-2 border-yellow-200 p-2.5 rounded-2xl shadow-xs">
+                    {/* 4-WEEK (INTERACTIVE BUTTON CARD - YELLOW-50) */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTier("monthly")}
+                      className={`p-2.5 rounded-2xl transition-all cursor-pointer text-center ${
+                        selectedTier === "monthly"
+                          ? "bg-yellow-50 border-2 border-yellow-600 ring-2 ring-yellow-500/20 shadow-md scale-102"
+                          : "bg-yellow-50/70 border-2 border-yellow-200 hover:border-yellow-400 shadow-2xs opacity-85 hover:opacity-100"
+                      }`}
+                    >
                       <div className="text-[10px] font-black uppercase tracking-wider text-yellow-800">4-Week</div>
                       <div className="text-xl sm:text-2xl font-black text-gray-950 mt-0.5">${currentMachine.monthly}</div>
                       <div className="text-[10px] text-gray-600 font-bold">Includes 160h</div>
-                    </div>
+                    </button>
                   </div>
                 </div>
 
@@ -349,11 +374,13 @@ export default function EquipmentCatalog() {
                 {/* ACTION BUTTONS (SOLID RED & YELLOW REMAIN) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <Link
-                    href="/book-now"
+                    href={`/book-now?equipment=${currentMachine.id}&tier=${selectedTier}`}
                     className="btn-red py-3.5 px-5 rounded-xl text-center text-xs sm:text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:scale-102 transition-all cursor-pointer"
                   >
                     <CalendarCheck className="w-4 h-4 text-white" />
-                    <span>Book This Machine</span>
+                    <span>
+                      Book {selectedTier === "daily" ? `Daily ($${currentMachine.daily})` : selectedTier === "weekly" ? `Weekly ($${currentMachine.weekly})` : `Monthly ($${currentMachine.monthly})`}
+                    </span>
                   </Link>
                   <Link
                     href="/pricing"

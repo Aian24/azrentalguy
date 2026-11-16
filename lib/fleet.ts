@@ -20,6 +20,7 @@ export interface EquipmentItem {
     weeklyPrice: number;
   }[];
   imageUrl: string;
+  images?: string[];
   badge?: string;
 }
 
@@ -61,7 +62,13 @@ export const FLEET: EquipmentItem[] = [
     ],
     requiresAZ811: true,
     badge: "Most Popular",
-    imageUrl: "/images/cat-259d3.jpg",
+    imageUrl: "/images/cat-ontrailer.webp",
+    images: [
+      "/images/cat-ontrailer.webp",
+      "/images/cat-front.webp",
+      "/images/cat-side.webp",
+      "/images/cat-back.webp",
+    ],
   },
   {
     id: "cat-226d3",
@@ -87,6 +94,13 @@ export const FLEET: EquipmentItem[] = [
     requiresAZ811: true,
     badge: "New Arrival",
     imageUrl: "/images/equipments/2021 Cat 226D3/1.jpg",
+    images: [
+      "/images/equipments/2021 Cat 226D3/1.jpg",
+      "/images/equipments/2021 Cat 226D3/2.jpg",
+      "/images/equipments/2021 Cat 226D3/3.jpg",
+      "/images/equipments/2021 Cat 226D3/4.jpg",
+      "/images/equipments/2021 Cat 226D3/5.jpg",
+    ],
   },
   {
     id: "jd-4044m",
@@ -123,7 +137,8 @@ export const FLEET: EquipmentItem[] = [
       },
     ],
     badge: "Versatile",
-    imageUrl: "/images/jd-4044m.jpg",
+    imageUrl: "/images/jd-4044.webp",
+    images: ["/images/jd-4044.webp"],
   },
   {
     id: "wt5c",
@@ -148,7 +163,8 @@ export const FLEET: EquipmentItem[] = [
     ],
     requiresAZ811: false,
     badge: "Dust Control",
-    imageUrl: "/images/wt5c.jpg",
+    imageUrl: "/images/water-trailer.webp",
+    images: ["/images/water-trailer.webp"],
   },
   {
     id: "load-trail",
@@ -173,7 +189,8 @@ export const FLEET: EquipmentItem[] = [
     ],
     requiresAZ811: false,
     badge: "Heavy Hauler",
-    imageUrl: "/images/load-trail.jpg",
+    imageUrl: "/images/cat-ontrailer.webp",
+    images: ["/images/cat-ontrailer.webp"],
   },
 ];
 

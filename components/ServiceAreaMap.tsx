@@ -40,16 +40,16 @@ export default function ServiceAreaMap() {
   };
 
   const cities = [
-    { name: "Phoenix", region: "Central & North Valley" },
-    { name: "Cave Creek & Carefree", region: "North Valley / Foothills" },
-    { name: "Scottsdale", region: "East Valley" },
-    { name: "Paradise Valley", region: "Central East" },
-    { name: "Mesa & Chandler", region: "Southeast Valley" },
-    { name: "Gilbert & Queen Creek", region: "Southeast Valley" },
-    { name: "Glendale & Peoria", region: "West Valley" },
-    { name: "Surprise & Sun City", region: "Northwest Valley" },
-    { name: "Goodyear & Buckeye", region: "Southwest Valley" },
-    { name: "Anthem & New River", region: "North I-17 Corridor" },
+    { name: "Phoenix", region: "Central & North Valley", zip: "85001" },
+    { name: "Cave Creek & Carefree", region: "North Valley / Foothills", zip: "85331" },
+    { name: "Scottsdale", region: "East Valley", zip: "85254" },
+    { name: "Paradise Valley", region: "Central East", zip: "85253" },
+    { name: "Mesa & Chandler", region: "Southeast Valley", zip: "85201" },
+    { name: "Gilbert & Queen Creek", region: "Southeast Valley", zip: "85234" },
+    { name: "Glendale & Peoria", region: "West Valley", zip: "85301" },
+    { name: "Surprise & Sun City", region: "Northwest Valley", zip: "85374" },
+    { name: "Goodyear & Buckeye", region: "Southwest Valley", zip: "85326" },
+    { name: "Anthem & New River", region: "North I-17 Corridor", zip: "85086" },
   ];
 
   return (
@@ -67,15 +67,24 @@ export default function ServiceAreaMap() {
               Don&apos;t waste project hours borrowing trailers and hitching equipment. AZ Rental Guy delivers clean, fully fueled heavy machinery directly to your jobsite gate or driveway and picks it up when your rental concludes.
             </p>
 
-            {/* CITIES SERVED GRID (FILLED LIGHT YELLOW PILLS) */}
+            {/* CITIES SERVED GRID (INTERACTIVE CLICKABLE BADGES) */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
               {cities.map((c, i) => (
                 <div
                   key={i}
-                  className="bg-yellow-50/80 border border-yellow-200 p-3 rounded-xl text-xs hover:border-red-600 transition-colors shadow-2xs"
+                  onClick={() => {
+                    setZipInput(c.zip);
+                    setZipStatus({
+                      covered: true,
+                      city: c.name,
+                      message: `Zip Code ${c.zip} (${c.name}) is in our primary Valley Service Zone! $150 flat-rate delivery & pickup confirmed.`,
+                    });
+                  }}
+                  className="bg-yellow-50/80 border border-yellow-200 hover:border-red-600 hover:scale-103 hover:shadow-md p-3 rounded-xl text-xs transition-all cursor-pointer shadow-2xs group"
+                  title={`Click to test delivery for ${c.name} (${c.zip})`}
                 >
-                  <div className="font-black text-gray-950 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
+                  <div className="font-black text-gray-950 flex items-center gap-1.5 group-hover:text-red-700 transition-colors">
+                    <MapPin className="w-3.5 h-3.5 text-red-600 flex-shrink-0 group-hover:scale-125 transition-transform" />
                     <span>{c.name}</span>
                   </div>
                   <div className="text-[10px] text-gray-700 font-bold mt-0.5">{c.region}</div>

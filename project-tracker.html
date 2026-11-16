@@ -1042,15 +1042,31 @@
         priority: "high",
         status: "done"
       },
+      {
+        id: "p1-16",
+        phase: "phase1",
+        title: "Workhorse Homepage Redesign: Video Hero Removed & Immediate Fleet Showcase Integrated",
+        desc: "Simplified homepage per client request: eliminated heavy background video hero, deployed compact workhorse header with direct dispatch line, placed interactive equipment fleet & rates immediately above/at the fold, and linked 1-click booking pre-selection.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p1-17",
+        phase: "phase1",
+        title: "In-Card Multi-Photo Slider & Fullscreen Lightbox Modal on Homepage Fleet Deck",
+        desc: "Added interactive prev/next chevron navigation, photo counter badge, and pagination dots directly inside homepage equipment card photo containers for units with multiple images; integrated fullscreen high-res lightbox modal with thumbnail strip and keyboard navigation; maintained uniform card height and perfectly aligned action buttons across all screen sizes.",
+        priority: "high",
+        status: "done"
+      },
 
       // PHASE 2: PRICING ENGINE
       {
         id: "p2-1",
         phase: "phase2",
         title: "Mathematical Best-Rate Optimization Algorithm",
-        desc: "Compute cheapest combination of daily ($450), weekly ($1,300), and 4-week ($3,150) tiers automatically.",
+        desc: "Compute cheapest combination of daily ($450), weekly ($1,300), and 4-week ($3,150) tiers automatically with automatic overflow tier savings.",
         priority: "high",
-        status: "pending"
+        status: "done"
       },
       {
         id: "p2-2",
@@ -1058,7 +1074,7 @@
         title: "Add-On Fee Calculator (Delivery, Waiver, Attachments)",
         desc: "Include $150 flat delivery, 10% optional damage waiver, and tractor attachments ($50/d, $100/w).",
         priority: "high",
-        status: "pending"
+        status: "done"
       },
       {
         id: "p2-3",
@@ -1066,15 +1082,15 @@
         title: "Tax Engine & Security Deposit Logic",
         desc: "Apply Arizona 8.6% Maricopa rental tax rate and $500 pre-authorization hold line item.",
         priority: "high",
-        status: "pending"
+        status: "done"
       },
       {
         id: "p2-4",
         phase: "phase2",
-        title: "Interactive Real-Time Quote Calculator UI",
-        desc: "Date-picker with live cost recalculation, operating hour limit display, and PDF estimate downloader.",
+        title: "Interactive Real-Time Quote Calculator UI & API Route (/api/quote)",
+        desc: "Integrated Master Pricing Engine API (/api/quote) and live calculation in BookingSection with dynamic savings callouts, operating hour limits, and Arizona 811 legal compliance.",
         priority: "medium",
-        status: "pending"
+        status: "done"
       },
 
       // PHASE 3: AGREEMENT
@@ -1257,7 +1273,7 @@
 
     // LOCAL STORAGE MANAGEMENT
     let tasks = [];
-    const STORAGE_KEY = "azrentalguy_tracker_tasks_v14";
+    const STORAGE_KEY = "azrentalguy_tracker_tasks_v17";
 
     function loadTasks() {
       const saved = localStorage.getItem(STORAGE_KEY);
