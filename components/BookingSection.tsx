@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { FLEET, COMPANY_INFO } from "@/lib/fleet";
 import { calculateQuote } from "@/lib/pricing";
-import { Calendar, ShieldAlert, CheckCircle, Truck, Phone, ShieldCheck, Check, Tag } from "lucide-react";
+import { Calendar, ShieldAlert, CheckCircle, Truck, Phone, ShieldCheck, Check, Tag, PenTool } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
+import SwalModal from "@/components/SwalModal";
 
 export default function BookingSection() {
   const [selectedMachineId, setSelectedMachineId] = useState("cat-259d3");
@@ -22,6 +24,24 @@ export default function BookingSection() {
   const [address, setAddress] = useState("");
 
   const [submitted, setSubmitted] = useState(false);
+  const [agreementId, setAgreementId] = useState("");
+
+  // SweetAlert-style Modal state
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    type: "warning" | "error" | "success" | "info";
+    title: string;
+    message: string;
+    confirmText?: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    type: "warning",
+    title: "",
+    message: "",
+    confirmText: "Got It, I'll Fix It",
+    onConfirm: () => {},
+  });
 
   useEffect(() => {
     const today = new Date();
@@ -64,10 +84,45 @@ export default function BookingSection() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (machine.requiresAZ811 && !az811Acknowledged) {
-      alert("Please acknowledge the Arizona 811 Call-Before-You-Dig safety requirement to proceed.");
+
+    if (!name.trim()) {
+      setModalConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Customer Name Required",
+        message: "Please enter your Full Name to reserve this equipment hold.",
+        confirmText: "Got It",
+        onConfirm: () => setModalConfig((p) => ({ ...p, isOpen: false })),
+      });
       return;
     }
+
+    if (!phone.trim()) {
+      setModalConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Contact Phone Required",
+        message: "Please enter your contact phone number so our team can confirm dispatch.",
+        confirmText: "Got It",
+        onConfirm: () => setModalConfig((p) => ({ ...p, isOpen: false })),
+      });
+      return;
+    }
+
+    if (machine.requiresAZ811 && !az811Acknowledged) {
+      setModalConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Arizona 811 Dig-Law Required",
+        message: "Pursuant to Arizona Revised Statutes § 40-360.21, you must check and acknowledge the mandatory Call-Before-You-Dig safety requirement to proceed with this earthmoving machine.",
+        confirmText: "I Understand",
+        onConfirm: () => setModalConfig((p) => ({ ...p, isOpen: false })),
+      });
+      return;
+    }
+
+    const generatedId = "AZR-" + Math.floor(100000 + Math.random() * 900000);
+    setAgreementId(generatedId);
     setSubmitted(true);
   };
 
@@ -92,10 +147,14 @@ export default function BookingSection() {
             <h3 className="text-2xl sm:text-3xl font-black text-gray-950">Rental Hold Requested!</h3>
             <p className="text-sm text-gray-700 mt-2.5 max-w-md mx-auto leading-relaxed font-medium">
               Thank you, <strong className="text-gray-950">{name || "Customer"}</strong>. Your 48-hour reservation hold for the{" "}
-              <strong className="text-red-600">{machine.name}</strong> has been received. Our dispatch team will confirm your delivery slot shortly.
+              <strong className="text-red-600">{machine.name}</strong> has been received under confirmation <strong className="text-gray-950">{agreementId}</strong>.
             </p>
 
             <div className="mt-6 bg-white border-2 border-red-200 p-5 rounded-2xl text-left text-xs space-y-2 max-w-md mx-auto shadow-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-500 font-semibold">Hold Reference:</span>
+                <strong className="text-red-600 font-black">{agreementId}</strong>
+              </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 font-semibold">Machine:</span>
                 <strong className="text-gray-950 font-black">{machine.name}</strong>
@@ -118,20 +177,32 @@ export default function BookingSection() {
               </div>
             </div>
 
-            <div className="mt-8 flex justify-center gap-4">
+            {/* 1-CLICK DIGITAL AGREEMENT & CALL CTA */}
+            <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
+              <Link
+                href={`/agreement/${agreementId || "AZR-884102"}?equipment=${machine.id}&start=${startDate}&end=${endDate}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&email=${encodeURIComponent(email)}&address=${encodeURIComponent(address)}&delivery=${deliveryIncluded}&waiver=${damageWaiver}&attachment=${withAttachment}`}
+                className="btn-red py-3.5 px-6 rounded-2xl text-xs font-black uppercase tracking-wider inline-flex items-center justify-center gap-2 shadow-lg hover:scale-102 transition-all cursor-pointer whitespace-nowrap"
+              >
+                <PenTool className="w-4 h-4 text-white" />
+                <span>Sign Digital Rental Agreement Now</span>
+              </Link>
+              <a
+                href={`tel:${COMPANY_INFO.phoneRaw}`}
+                className="btn-yellow py-3.5 px-6 rounded-2xl text-xs font-black uppercase tracking-wider inline-flex items-center justify-center gap-2 shadow-sm whitespace-nowrap"
+              >
+                <Phone className="w-4 h-4 text-gray-950" />
+                <span>Call Dispatch ({COMPANY_INFO.phone})</span>
+              </a>
+            </div>
+
+            <div className="mt-4">
               <button
                 type="button"
                 onClick={() => setSubmitted(false)}
-                className="btn-yellow px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider"
+                className="text-xs font-bold text-gray-500 hover:text-gray-950 underline cursor-pointer"
               >
-                Submit Another Request
+                ← Edit reservation details or submit another request
               </button>
-              <a
-                href={`tel:${COMPANY_INFO.phoneRaw}`}
-                className="btn-red px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider"
-              >
-                Call Dispatch ({COMPANY_INFO.phone})
-              </a>
             </div>
           </ScrollReveal>
         ) : (
@@ -519,6 +590,9 @@ export default function BookingSection() {
           </div>
         )}
       </div>
+
+      {/* SWEETALERT-STYLE VALIDATION MODAL */}
+      <SwalModal {...modalConfig} />
     </section>
   );
 }

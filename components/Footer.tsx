@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Phone, Mail, MapPin, ShieldAlert, ExternalLink, ArrowUp } from "lucide-react";
+import { Phone, Mail, MapPin, ShieldAlert, ExternalLink, ArrowUp, FileText } from "lucide-react";
 import { COMPANY_INFO, FLEET } from "@/lib/fleet";
 
 export default function Footer() {
@@ -91,6 +91,15 @@ export default function Footer() {
                   <span>A.R.S. § 40-360.21 (AZ 811)</span>
                   <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
                 </a>
+              </li>
+              <li>
+                <Link
+                  href="/agreement/AZR-SAMPLE-01"
+                  className="hover:text-red-600 flex items-center gap-1.5 font-bold text-gray-800 transition-colors"
+                >
+                  <FileText className="w-4 h-4 text-red-600" />
+                  <span>Digital Rental Agreement (Sample)</span>
+                </Link>
               </li>
               <li>Operating Hours: 8h/day, 40h/wk, 160h/mo</li>
               <li>Overtime Rate: $75.00 / hour</li>

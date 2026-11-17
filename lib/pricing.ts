@@ -56,6 +56,8 @@ export interface QuoteResult {
   };
 }
 
+export type QuoteCalculation = QuoteResult;
+
 /**
  * Calculates rental days from start and end dates.
  * Standard equipment rental includes both start and end calendar days.
