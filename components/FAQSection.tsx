@@ -45,7 +45,7 @@ export default function FAQSection() {
   ];
 
   return (
-    <section id="faq" className="py-12 sm:py-16 bg-white border-b border-gray-200">
+    <section id="faq" className="scroll-mt-20 sm:scroll-mt-24 py-12 sm:py-16 bg-white border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal className="text-center max-w-3xl mx-auto mb-10">
           <h2 className="text-3xl sm:text-4xl font-black text-gray-950 tracking-tight">

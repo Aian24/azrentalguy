@@ -284,7 +284,7 @@ export default function DigitalAgreementView({ agreementId }: DigitalAgreementVi
         {/* TOP NAVIGATION / RETURN */}
         <div className="mb-6 flex items-center justify-between print:hidden">
           <Link
-            href="/book-now"
+            href="/#Booknow"
             className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-gray-600 hover:text-red-600 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />

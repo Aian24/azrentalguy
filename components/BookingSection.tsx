@@ -53,10 +53,26 @@ export default function BookingSection() {
 
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      const eqParam = params.get("equipment");
+      let eqParam = params.get("equipment");
+      if (!eqParam && window.location.hash.includes("?")) {
+        const hashQuery = window.location.hash.split("?")[1];
+        eqParam = new URLSearchParams(hashQuery).get("equipment");
+      }
       if (eqParam && FLEET.some((m) => m.id === eqParam)) {
         setSelectedMachineId(eqParam);
       }
+
+      const handleCustomSelect = (e: Event) => {
+        const customEvent = e as CustomEvent<string>;
+        if (customEvent.detail && FLEET.some((m) => m.id === customEvent.detail)) {
+          setSelectedMachineId(customEvent.detail);
+        }
+      };
+
+      window.addEventListener("select-equipment", handleCustomSelect);
+      return () => {
+        window.removeEventListener("select-equipment", handleCustomSelect);
+      };
     }
   }, []);
 
@@ -127,7 +143,7 @@ export default function BookingSection() {
   };
 
   return (
-    <section id="Booknow" className="py-12 sm:py-16 bg-white border-b border-gray-200">
+    <section id="Booknow" className="scroll-mt-20 sm:scroll-mt-24 py-12 sm:py-16 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* HEADER - NO BADGE PER USER REQUEST */}
         <ScrollReveal className="text-center max-w-3xl mx-auto mb-10">

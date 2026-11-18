@@ -53,18 +53,17 @@ export default function ServiceAreaMap() {
   ];
 
   return (
-    <section id="delivery" className="py-12 sm:py-16 bg-white border-b border-gray-200">
+    <section id="delivery" className="scroll-mt-20 sm:scroll-mt-24 py-12 sm:py-16 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* LEFT: DELIVERY INFORMATION */}
           <ScrollReveal className="lg:col-span-7 space-y-5">
             <h2 className="text-3xl sm:text-4xl font-black text-gray-950 tracking-tight">
-              Valley-Wide Equipment Delivery For Just{" "}
-              <span className="text-red-600">$150 Flat</span>.
+              Jobsite Delivery Across <span className="text-red-600">Maricopa County</span>
             </h2>
 
             <p className="text-sm sm:text-base text-gray-600 leading-relaxed font-medium">
-              Don&apos;t waste project hours borrowing trailers and hitching equipment. AZ Rental Guy delivers clean, fully fueled heavy machinery directly to your jobsite gate or driveway and picks it up when your rental concludes.
+              We deliver clean, fully fueled heavy machinery directly to your jobsite or driveway across the Valley, with pickup included when your rental concludes.
             </p>
 
             {/* CITIES SERVED GRID (INTERACTIVE CLICKABLE BADGES) */}

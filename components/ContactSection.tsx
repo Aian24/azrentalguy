@@ -20,7 +20,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="Contact" className="py-12 sm:py-16 bg-white border-b border-gray-200">
+    <section id="Contact" className="scroll-mt-20 sm:scroll-mt-24 py-12 sm:py-16 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* HEADER - NO BADGE PER USER REQUEST */}
         <ScrollReveal className="text-center max-w-3xl mx-auto mb-10">

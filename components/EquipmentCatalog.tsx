@@ -25,7 +25,7 @@ export default function EquipmentCatalog() {
       id: "cat-259d3",
       name: "CAT 259D3 Compact Track Loader",
       shortName: "CAT 259D3",
-      subtitle: "Powerful low-hour track loader for excavation, desert grading, and material hauling.",
+      subtitle: "Powerful, versatile, and ready for your toughest jobs. Perfect for landscaping and grading.",
       category: "Track Loader",
       images: [
         "/images/cat-ontrailer.webp",
@@ -35,7 +35,7 @@ export default function EquipmentCatalog() {
       ],
       keySpecs: [
         { label: "Engine", val: "74.3 HP Turbo Diesel" },
-        { label: "Operating Weight", val: "8,987 lbs" },
+        { label: "Operating Weight", val: "8,987 lbs (2,010 lb ROC)" },
         { label: "Operating Hours", val: "8h/d • 40h/w • 160h/mo" },
       ],
       daily: 450,
@@ -45,9 +45,9 @@ export default function EquipmentCatalog() {
     },
     {
       id: "cat-226d3",
-      name: "2021 Cat 226D3 CA Skid Steer Loader",
-      shortName: "CAT 226D3",
-      subtitle: "Enclosed cab model with AC & stereo. Compact radial-lift skid steer for tight spaces and everyday work.",
+      name: "2021 Cat 226D3 Skid Steer Loader",
+      shortName: "Cat 226D3",
+      subtitle: "Enclosed cab model with AC & stereo. Compact radial-lift skid steer.",
       category: "Skid Steer",
       images: [
         "/images/equipments/2021 Cat 226D3/1.jpg",
@@ -57,9 +57,9 @@ export default function EquipmentCatalog() {
         "/images/equipments/2021 Cat 226D3/5.jpg",
       ],
       keySpecs: [
-        { label: "Engine", val: "Cat C2.2 (67 HP)" },
+        { label: "Engine", val: "Cat C2.2 Diesel (67 HP)" },
         { label: "Capacity (ROC)", val: "1,550 lbs (1,650 w/ wt)" },
-        { label: "Operating Weight", val: "5,850 lbs (Radial)" },
+        { label: "Operating Weight", val: "5,850 lbs" },
       ],
       daily: 275,
       weekly: 1000,
@@ -68,14 +68,14 @@ export default function EquipmentCatalog() {
     },
     {
       id: "jd-4044m",
-      name: "2021 John Deere 4044M Utility Tractor",
+      name: "2021 John Deere 4044M",
       shortName: "John Deere 4044M",
-      subtitle: "4WD utility tractor with heavy front-end loader bucket and auxiliary hydraulics.",
+      subtitle: "With loader bucket and grapple attachments. Perfect for landscaping or farm work.",
       category: "Utility Tractor",
       images: ["/images/jd-4044.webp"],
       keySpecs: [
         { label: "Horsepower", val: "44 HP Yanmar Diesel" },
-        { label: "Drivetrain", val: "4-Wheel Drive (4WD)" },
+        { label: "Drivetrain", val: "Hydrostatic 4WD" },
         { label: "Operating Hours", val: "8h/d • 40h/w • 160h/mo" },
       ],
       daily: 300,
@@ -85,14 +85,14 @@ export default function EquipmentCatalog() {
     },
     {
       id: "wt5c",
-      name: "Multi-Quip WT5C 500-Gallon Water Trailer",
+      name: "Multi-quip WT5C 500-gallon water trailer",
       shortName: "WT5C Water Trailer",
-      subtitle: "Commercial dust suppression, soil compaction, and jobsite water supply.",
+      subtitle: "Dust control, compaction, general water hauling.",
       category: "Water Trailer",
       images: ["/images/water-trailer.webp"],
       keySpecs: [
         { label: "Tank Capacity", val: "500-Gal Poly Tank" },
-        { label: "Engine Pump", val: "Honda Centrifugal" },
+        { label: "Centrifugal Pump", val: "Honda Pump (158 GPM)" },
         { label: "Hours / Miles", val: "Unlimited Hours" },
       ],
       daily: 150,
@@ -103,14 +103,14 @@ export default function EquipmentCatalog() {
     {
       id: "load-trail",
       name: "2025 Load Trail Gooseneck Deckover Trailer",
-      shortName: "Load Trail Hauler",
-      subtitle: "Commercial heavy hauler with dual 10k axles and spring-assisted monster ramps.",
+      shortName: "Load Trail Trailer",
+      subtitle: "26 ft overall length with hydraulic tilt deck. Tandem 10K axles with electric brakes.",
       category: "Heavy Trailer",
       images: ["/images/cat-ontrailer.webp"],
       keySpecs: [
-        { label: "Coupler", val: "2-5/16\" Commercial Gooseneck" },
-        { label: "Axles & GVWR", val: "Dual 10k (20,000 lbs)" },
-        { label: "Ramps", val: "Spring Monster Flip Ramps" },
+        { label: "Coupler", val: "2-5/16\" Gooseneck (30K Rated)" },
+        { label: "Axles & GVWR", val: "Tandem 10K (20,000 lbs)" },
+        { label: "Tilt Deck", val: "Hydraulic Tilt with Remote" },
       ],
       daily: 175,
       weekly: 700,
@@ -158,7 +158,7 @@ export default function EquipmentCatalog() {
   const displayTabs = getVisibleTabs();
 
   return (
-    <section id="Equipment" className="py-10 sm:py-14 bg-white border-b border-gray-200">
+    <section id="Equipment" className="pt-20 sm:pt-24 pb-12 sm:pb-16 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* SECTION HEADER - LABELS ONLY, NO BADGES */}
         <ScrollReveal className="text-center max-w-3xl mx-auto mb-6">

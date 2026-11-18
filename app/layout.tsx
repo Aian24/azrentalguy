@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { COMPANY_INFO } from "@/lib/fleet";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const metadata: Metadata = {
   title: "AZ Rental Guy | Professional Equipment Rental Phoenix AZ | J-Bone Industries",
@@ -76,6 +77,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col bg-white text-gray-900">
         {children}
+        <ScrollToTop />
       </body>
     </html>
   );

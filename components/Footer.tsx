@@ -47,29 +47,29 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 font-bold">
               <li>
-                <Link href="/" className="hover:text-red-600 transition-colors">
+                <a href="/#home" className="hover:text-red-600 transition-colors">
                   Home
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/equipment" className="hover:text-red-600 transition-colors">
+                <a href="/#Equipment" className="hover:text-red-600 transition-colors">
                   Equipment Fleet
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-red-600 transition-colors">
+                <a href="/#Pricing" className="hover:text-red-600 transition-colors">
                   Rental Pricing
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/book-now" className="hover:text-red-600 transition-colors text-red-600">
+                <a href="/#Booknow" className="hover:text-red-600 transition-colors text-red-600">
                   Book Now (48-Hr Hold)
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-red-600 transition-colors">
+                <a href="/#Contact" className="hover:text-red-600 transition-colors">
                   Contact Us
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
