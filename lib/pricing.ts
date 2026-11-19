@@ -1,4 +1,4 @@
-import { FLEET, COMPANY_INFO, EquipmentItem } from "./fleet";
+import { FLEET, COMPANY_INFO, EquipmentItem, getStoredFleet } from "./fleet";
 
 export interface QuoteParams {
   equipmentId: string;
@@ -210,7 +210,8 @@ export function calculateAttachmentCost(
  * Maricopa County rental tax (8.6%), and $500 refundable security hold.
  */
 export function calculateQuote(params: QuoteParams): QuoteResult {
-  const equipment = FLEET.find((m) => m.id === params.equipmentId) || FLEET[0];
+  const currentFleet = getStoredFleet();
+  const equipment = currentFleet.find((m) => m.id === params.equipmentId) || currentFleet[0] || FLEET[0];
   const days = calculateRentalDays(params.startDate, params.endDate);
 
   // 1. Optimized Base Rate

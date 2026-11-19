@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FLEET, EquipmentItem } from "@/lib/fleet";
+import { FLEET, EquipmentItem, getStoredFleet } from "@/lib/fleet";
 import {
   CalendarCheck,
   ChevronRight,
@@ -17,6 +17,21 @@ export default function HomeFleetShowcase() {
   const [startIndex, setStartIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [visibleCount, setVisibleCount] = useState(2);
+  const [fleetList, setFleetList] = useState<EquipmentItem[]>(FLEET);
+
+  // Sync with stored fleet updates from admin manager
+  useEffect(() => {
+    setFleetList(getStoredFleet());
+    const handleSync = () => {
+      setFleetList(getStoredFleet());
+    };
+    window.addEventListener("az_fleet_updated", handleSync);
+    window.addEventListener("storage", handleSync);
+    return () => {
+      window.removeEventListener("az_fleet_updated", handleSync);
+      window.removeEventListener("storage", handleSync);
+    };
+  }, []);
 
   // In-card photo carousel index state per machine ID
   const [cardImgIndex, setCardImgIndex] = useState<{ [id: string]: number }>({});
@@ -40,7 +55,7 @@ export default function HomeFleetShowcase() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const maxIndex = Math.max(0, FLEET.length - visibleCount);
+  const maxIndex = Math.max(0, fleetList.length - visibleCount);
 
   // Auto-play timer: advances through equipment every 4.5 seconds, pauses on hover
   useEffect(() => {
@@ -156,7 +171,7 @@ export default function HomeFleetShowcase() {
                 transform: `translateX(-${startIndex * (100 / visibleCount)}%)`,
               }}
             >
-              {FLEET.map((machine) => {
+              {fleetList.map((machine) => {
                 const images =
                   machine.images && machine.images.length > 0
                     ? machine.images

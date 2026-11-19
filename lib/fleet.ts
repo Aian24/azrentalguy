@@ -23,6 +23,13 @@ export interface EquipmentItem {
   images?: string[];
   badge?: string;
   fullSpecs?: { label: string; value: string }[];
+  status?: "available" | "rented" | "maintenance" | "reserved";
+  serialNumber?: string;
+  engineHours?: number;
+  nextServiceHours?: number;
+  year?: number;
+  weekendRate?: number;
+  depositAmount?: number;
 }
 
 export const COMPANY_INFO = {
@@ -259,3 +266,29 @@ export const FLEET: EquipmentItem[] = [
     images: ["/images/cat-ontrailer.webp"],
   },
 ];
+
+export function getStoredFleet(): EquipmentItem[] {
+  if (typeof window === "undefined") return FLEET;
+  try {
+    const stored = localStorage.getItem("az_admin_fleet");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load stored fleet:", err);
+  }
+  return FLEET;
+}
+
+export function saveStoredFleet(fleet: EquipmentItem[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("az_admin_fleet", JSON.stringify(fleet));
+    window.dispatchEvent(new Event("az_fleet_updated"));
+  } catch (err) {
+    console.error("Failed to save stored fleet:", err);
+  }
+}

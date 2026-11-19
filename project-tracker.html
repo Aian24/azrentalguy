@@ -29,6 +29,8 @@
       --status-wip-bg: #1E3A8A;
       --status-pending: #64748B;
       --status-pending-bg: #1E293B;
+      --status-skipped: #F59E0B;
+      --status-skipped-bg: #78350F;
       --status-alert: #EF4444;
       --status-alert-bg: #7F1D1D;
     }
@@ -458,6 +460,16 @@
       color: var(--text-dim);
     }
 
+    .task-item.skipped {
+      opacity: 0.75;
+      border-left: 3px solid var(--status-skipped);
+      background-color: rgba(245, 158, 11, 0.04);
+    }
+
+    .task-item.skipped .task-content h4 {
+      color: #FBBF24;
+    }
+
     .task-right {
       display: flex;
       align-items: center;
@@ -504,6 +516,12 @@
       background-color: #1E293B;
       color: #CBD5E1;
       border: 1px solid #334155;
+    }
+
+    .priority-skipped {
+      background-color: var(--status-skipped-bg);
+      color: #FCD34D;
+      border: 1px solid #B45309;
     }
 
     /* REFERENCE TABLES & PANELS */
@@ -641,9 +659,9 @@
     <!-- TOP METRICS -->
     <div class="metrics-grid">
       <div class="metric-card gold-border">
-        <div class="metric-label">Overall Completion</div>
+        <div class="metric-label">Active Build Completion</div>
         <div class="metric-value" id="overall-percentage">0%</div>
-        <div class="metric-sub" id="overall-fraction">0 / 0 Tasks Finished</div>
+        <div class="metric-sub" id="overall-fraction">0 / 0 Active Tasks Finished</div>
       </div>
       <div class="metric-card green-border">
         <div class="metric-label">Completed Tasks</div>
@@ -659,6 +677,11 @@
         <div class="metric-label">Pending Backlog</div>
         <div class="metric-value" id="count-pending" style="color: var(--text-muted);">0</div>
         <div class="metric-sub">Upcoming Phases</div>
+      </div>
+      <div class="metric-card" style="border-left: 4px solid var(--status-skipped);">
+        <div class="metric-label">Skipped / Deferred</div>
+        <div class="metric-value" id="count-skipped" style="color: var(--status-skipped);">0</div>
+        <div class="metric-sub">Client Directive (On Hold)</div>
       </div>
     </div>
 
@@ -676,16 +699,16 @@
     <!-- VIEW TABS -->
     <div class="view-tabs">
       <button class="view-tab active" onclick="switchView('tasks-tab', this)">
-        <span>📋</span> Interactive Tasks & Sprints
+        Interactive Tasks & Sprints
       </button>
       <button class="view-tab" onclick="switchView('fleet-tab', this)">
-        <span>🚜</span> Equipment Fleet & Pricing Matrix
+        Equipment Fleet & Pricing Matrix
       </button>
       <button class="view-tab" onclick="switchView('tech-tab', this)">
-        <span>⚡</span> Tech Stack & Solid Design System
+        Tech Stack & Solid Design System
       </button>
       <button class="view-tab" onclick="switchView('deploy-tab', this)">
-        <span>🚀</span> Vercel Staging & Plesk Migration Guide
+        Vercel Staging & Plesk Migration Guide
       </button>
     </div>
 
@@ -697,9 +720,10 @@
           <button class="filter-btn" onclick="filterPhase('phase1', this)">Phase 1: Frontend</button>
           <button class="filter-btn" onclick="filterPhase('phase2', this)">Phase 2: Pricing</button>
           <button class="filter-btn" onclick="filterPhase('phase3', this)">Phase 3: Agreement</button>
-          <button class="filter-btn" onclick="filterPhase('phase4', this)">Phase 4: AI Bot</button>
+          <button class="filter-btn" onclick="filterPhase('phase4', this)">Phase 4: AI Bot (Skipped)</button>
           <button class="filter-btn" onclick="filterPhase('phase5', this)">Phase 5: Admin CRM</button>
-          <button class="filter-btn" onclick="filterPhase('phase6', this)">Phase 6: Deployment</button>
+          <button class="filter-btn" onclick="filterPhase('phase6', this)">Phase 6: Backend & DB</button>
+          <button class="filter-btn" onclick="filterPhase('phase7', this)">Phase 7: Plesk Live</button>
         </div>
         <input type="text" id="task-search" class="search-input" placeholder="Search tasks, specs, APIs..."
           oninput="handleSearch()">
@@ -909,7 +933,8 @@
           <li>Set <strong>Application Mode:</strong> <code>production</code>.</li>
           <li>Set <strong>Application Root:</strong> <code>/httpdocs</code> or <code>/httpdocs/azrentalguy</code>.</li>
           <li>Set <strong>Application Startup File:</strong> <code>server.js</code> (Next.js standalone server) or
-            <code>node_modules/next/dist/bin/next</code> with argument <code>start</code>.</li>
+            <code>node_modules/next/dist/bin/next</code> with argument <code>start</code>.
+          </li>
           <li>Run <code>npm run build</code> inside Plesk SSH or Web Terminal.</li>
           <li>Point domain DNS records or enable the Node.js application proxy. Plesk automatically manages the Let's
             Encrypt SSL certificate.</li>
@@ -1135,64 +1160,64 @@
         status: "done"
       },
 
-      // PHASE 4: AI BOT
+      // PHASE 4: AI BOT (SKIPPED / ON HOLD - CLIENT DECISION - PRESERVED IN PLAN)
       {
         id: "p4-1",
         phase: "phase4",
         title: "24/7 AI Floating Rental Assistant Widget",
-        desc: "Industrial chat interface anchored to bottom-right corner with minimize/maximize and mobile responsiveness.",
-        priority: "high",
-        status: "pending"
+        desc: "[SKIPPED / ON HOLD - Client Decision] Industrial chat interface anchored to bottom-right corner with minimize/maximize and mobile responsiveness.",
+        priority: "standard",
+        status: "skipped"
       },
       {
         id: "p4-2",
         phase: "phase4",
         title: "Machine Recommendation Natural Language Parser",
-        desc: "Understands job prompts ('need to grade 2 acres in Cave Creek') and recommends matching equipment.",
-        priority: "high",
-        status: "pending"
+        desc: "[SKIPPED / ON HOLD - Client Decision] Understands job prompts ('need to grade 2 acres in Cave Creek') and recommends matching equipment.",
+        priority: "standard",
+        status: "skipped"
       },
       {
         id: "p4-3",
         phase: "phase4",
         title: "Math-Locked Dynamic Pricing Integration",
-        desc: "Forces AI to query the pricing engine API; strictly prohibits LLM hallucination of rental numbers.",
-        priority: "high",
-        status: "pending"
+        desc: "[SKIPPED / ON HOLD - Client Decision] Forces AI to query the pricing engine API; strictly prohibits LLM hallucination of rental numbers.",
+        priority: "standard",
+        status: "skipped"
       },
       {
         id: "p4-4",
         phase: "phase4",
         title: "Lead Capture & CRM Instant Dispatch",
-        desc: "Gathers customer name, phone, email, and jobsite address; immediately notifies operator via SMS/Email.",
-        priority: "high",
-        status: "pending"
+        desc: "[SKIPPED / ON HOLD - Client Decision] Gathers customer name, phone, email, and jobsite address; immediately notifies operator via SMS/Email.",
+        priority: "standard",
+        status: "skipped"
       },
       {
         id: "p4-5",
         phase: "phase4",
         title: "1-Click 'Book These Dates' Checkout Pre-fill",
-        desc: "Injects dates, equipment selection, and customer contact directly into reservation modal.",
-        priority: "medium",
-        status: "pending"
+        desc: "[SKIPPED / ON HOLD - Client Decision] Injects dates, equipment selection, and customer contact directly into reservation modal.",
+        priority: "standard",
+        status: "skipped"
       },
 
       // PHASE 5: ADMIN CRM
       {
         id: "p5-1",
         phase: "phase5",
-        title: "Today's Dispatch & Active Holds Hub",
-        desc: "Live dashboard showing units heading out, returns due today, overdue alerts, and expiring 48-hr holds.",
+        title: "Multi-Date Dispatch Schedule & Deliveries Data Table",
+        desc: "Scalable Data Table for valley-wide deliveries with multi-date filtering (Today, Tomorrow, Yesterday, This Week, Past Records, Date Picker), search, status filtering, and 10+ entry pagination. Active 48-hr holds housed in dedicated modal.",
         priority: "high",
-        status: "pending"
+        status: "done"
       },
       {
         id: "p5-2",
         phase: "phase5",
-        title: "Lead Pipeline Kanban & Phone-In Entry Form",
-        desc: "Manage pipeline stages: Inquired, Quoted, Agreement Sent, Reserved, Active, Closed. Quick phone-in lead entry.",
+        title: "Lead Pipeline Data Table & Kanban View",
+        desc: "Scalable Contractor Data Table with view switcher to Kanban, 6-stage filtering, machine dropdown, uniform height headers, and default 10 entries.",
         priority: "high",
-        status: "pending"
+        status: "done"
       },
       {
         id: "p5-3",
@@ -1200,7 +1225,7 @@
         title: "Fleet Booking Calendar & Unit Timeline",
         desc: "Visual Gantt-style timeline showing equipment utilization, maintenance holds, and availability gaps.",
         priority: "medium",
-        status: "pending"
+        status: "done"
       },
       {
         id: "p5-4",
@@ -1208,7 +1233,7 @@
         title: "Maricopa County Permit Pipeline & AI Outreach",
         desc: "CSV upload of county permits; AI scores equipment needs and drafts personalized SMS/email pitches.",
         priority: "medium",
-        status: "pending"
+        status: "done"
       },
       {
         id: "p5-5",
@@ -1216,45 +1241,111 @@
         title: "Google Review Automated Follow-Up Engine",
         desc: "Queues SMS review request 24 hours after machine return with 1-click Google Business review link.",
         priority: "standard",
-        status: "pending"
+        status: "done"
       },
-
-      // PHASE 6: DEPLOYMENT
       {
-        id: "p6-0",
-        phase: "phase6",
-        title: "GitHub Repository Initialized & Pushed (main branch)",
-        desc: "Source code pushed to https://github.com/Aian24/azrentalguy with full Next.js project structure, public assets, and clean git history.",
+        id: "p5-6",
+        phase: "phase5",
+        title: "Fleet Inventory & Dynamic Pricing Control Room (/admin/fleet)",
+        desc: "Complete equipment manager supporting multi-photo upload and drag-and-drop gallery, preset angles loader, primary cover photo selection, rate overrides, engine hour meter tracking, and Arizona 811 requirement toggles.",
         priority: "high",
         status: "done"
       },
+      {
+        id: "p5-7",
+        phase: "phase5",
+        title: "System Configuration & Operator Settings (/admin/settings)",
+        desc: "Global controls for company legal entity, logo sizing, Arizona MST timezone, typography scaling, universal deposit & fee rates, and operator password management.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p5-8",
+        phase: "phase5",
+        title: "Operator User Manual & Interactive Guide (/admin/manual)",
+        desc: "Beginner-friendly visual guide explaining the exact purpose, step-by-step instructions, and operational tips for every screen without AI jargon or gradients.",
+        priority: "medium",
+        status: "done"
+      },
+      {
+        id: "p5-9",
+        phase: "phase5",
+        title: "Branded SweetAlert2 Confirmation & Alert Dialogs",
+        desc: "Custom-styled red & gold warning and confirmation modals replacing native browser alerts throughout the admin portal.",
+        priority: "medium",
+        status: "done"
+      },
+
+      // PHASE 6: DATABASE & BACKEND ARCHITECTURE (NEXT PHASE TO BUILD)
       {
         id: "p6-1",
         phase: "phase6",
-        title: "Vercel Staging Environment Deployment Live",
-        desc: "Next.js project successfully deployed and live on Vercel at https://azrentalguy.vercel.app/ with global CDN edge delivery and mobile optimization.",
+        title: "Database Schema & Migration (PostgreSQL / SQLite via Prisma/Drizzle)",
+        desc: "Establish persistent relational database schemas for Equipment, Bookings, 48-Hour Holds, Invoices, Customers, Permit Leads, and System Settings.",
         priority: "high",
-        status: "done"
+        status: "pending"
       },
       {
         id: "p6-2",
         phase: "phase6",
-        title: "End-to-End Rental Booking Test on Staging",
-        desc: "Execute complete rental test: AI lead inquiry → Quote calculation → 48-hr Hold → Mobile Agreement Signature.",
+        title: "Server Actions & API Layer (Replacing localStorage with DB Persistence)",
+        desc: "Implement Next.js Server Actions and API endpoints for real CRUD operations on fleet inventory, bookings, hold timers, and lead tracking.",
         priority: "high",
         status: "pending"
       },
       {
         id: "p6-3",
         phase: "phase6",
-        title: "Plesk Node.js / Passenger Production Configuration",
-        desc: "Configure Plesk Obsidian Node.js application manager, environment secrets, and PM2/Passenger startup file.",
+        title: "Secure Admin Authentication & Protected Sessions",
+        desc: "Password hashing (bcrypt/argon2), JWT session tokens, role-based route middleware, and CSRF protection for operator login.",
         priority: "high",
         status: "pending"
       },
       {
         id: "p6-4",
         phase: "phase6",
+        title: "Automated Notification Services (Twilio SMS & SendGrid/Resend PDF Receipts)",
+        desc: "Automated SMS alerts for 48-hour hold expiration and email delivery of digitally signed Arizona rental agreement PDF receipts.",
+        priority: "medium",
+        status: "pending"
+      },
+      {
+        id: "p6-5",
+        phase: "phase6",
+        title: "End-to-End Real Database Booking & Audit Trail Test",
+        desc: "Perform complete integration test: live customer inquiry → quote calculation → database hold creation → agreement signature cryptographic audit hash.",
+        priority: "high",
+        status: "pending"
+      },
+
+      // PHASE 7: PLESK PRODUCTION DEPLOYMENT & CUTOVER
+      {
+        id: "p7-0",
+        phase: "phase7",
+        title: "GitHub Repository Initialized & Main Pushed",
+        desc: "Source code pushed to https://github.com/Aian24/azrentalguy with full Next.js project structure, public assets, and clean git history.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p7-1",
+        phase: "phase7",
+        title: "Vercel Staging Environment Deployment Live",
+        desc: "Next.js project successfully deployed and live on Vercel at https://azrentalguy.vercel.app/ with global CDN edge delivery and mobile optimization.",
+        priority: "high",
+        status: "done"
+      },
+      {
+        id: "p7-2",
+        phase: "phase7",
+        title: "Plesk Node.js / Passenger Production Configuration",
+        desc: "Configure Plesk Obsidian Node.js application manager, environment secrets, and PM2/Passenger startup file.",
+        priority: "high",
+        status: "pending"
+      },
+      {
+        id: "p7-3",
+        phase: "phase7",
         title: "SSL Certificate & Domain Cutover to azrentalguy.com",
         desc: "Verify DNS records, test HTTPS certificates, verify mobile responsiveness, and perform zero-downtime cutover.",
         priority: "high",
@@ -1266,14 +1357,15 @@
       phase1: { name: "Phase 1: High-Conversion Frontend & Catalog UI", badge: "Frontend" },
       phase2: { name: "Phase 2: Instant Pricing & Optimization Engine", badge: "Engine" },
       phase3: { name: "Phase 3: Arizona Digital Agreement & Signature Flow", badge: "Legal / Flow" },
-      phase4: { name: "Phase 4: 24/7 AI Rental Assistant & Lead Generator", badge: "AI Automation" },
-      phase5: { name: "Phase 5: Operator CRM & Dispatch Dashboard", badge: "Admin / Ops" },
-      phase6: { name: "Phase 6: Vercel Staging & Plesk Production Cutover", badge: "DevOps" }
+      phase4: { name: "Phase 4: 24/7 AI Rental Assistant (Skipped / On Hold — Client Directive)", badge: "AI Assistant (Deferred)" },
+      phase5: { name: "Phase 5: Operator CRM & Admin Operations Dashboard", badge: "Admin / Ops" },
+      phase6: { name: "Phase 6: Database & Backend Architecture (Next Phase)", badge: "Backend / DB" },
+      phase7: { name: "Phase 7: Plesk Production Cutover & Deployment", badge: "Plesk / DevOps" }
     };
 
     // LOCAL STORAGE MANAGEMENT
     let tasks = [];
-    const STORAGE_KEY = "azrentalguy_tracker_tasks_v18";
+    const STORAGE_KEY = "azrentalguy_tracker_tasks_v23";
 
     function loadTasks() {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -1356,17 +1448,22 @@
     // RENDER FUNCTIONS
     function renderDashboard() {
       const total = tasks.length;
+      const skippedCount = tasks.filter(t => t.status === "skipped").length;
+      const activeTotal = total - skippedCount;
       const doneCount = tasks.filter(t => t.status === "done").length;
       const wipCount = tasks.filter(t => t.status === "in-progress").length;
       const pendingCount = tasks.filter(t => t.status === "pending").length;
-      const percentage = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+      const percentage = activeTotal > 0 ? Math.round((doneCount / activeTotal) * 100) : 0;
 
       document.getElementById("overall-percentage").innerText = percentage + "%";
-      document.getElementById("overall-fraction").innerText = `${doneCount} of ${total} Tasks Finished`;
+      document.getElementById("overall-fraction").innerText = `${doneCount} of ${activeTotal} Active Tasks (${skippedCount} Skipped)`;
       document.getElementById("count-done").innerText = doneCount;
       document.getElementById("count-wip").innerText = wipCount;
       document.getElementById("count-pending").innerText = pendingCount;
-      document.getElementById("bar-percentage-label").innerText = percentage + "% Complete";
+      if (document.getElementById("count-skipped")) {
+        document.getElementById("count-skipped").innerText = skippedCount;
+      }
+      document.getElementById("bar-percentage-label").innerText = percentage + "% Complete (Active Scope)";
       document.getElementById("main-progress-bar").style.width = percentage + "%";
 
       renderPhases();
@@ -1376,7 +1473,7 @@
       const container = document.getElementById("phases-container");
       container.innerHTML = "";
 
-      const phaseKeys = ["phase1", "phase2", "phase3", "phase4", "phase5", "phase6"];
+      const phaseKeys = ["phase1", "phase2", "phase3", "phase4", "phase5", "phase6", "phase7"];
 
       phaseKeys.forEach(phaseKey => {
         if (activePhaseFilter !== "all" && activePhaseFilter !== phaseKey) {
@@ -1396,7 +1493,11 @@
         const meta = PHASE_METADATA[phaseKey];
         const allPhaseTasks = tasks.filter(t => t.phase === phaseKey);
         const phaseDone = allPhaseTasks.filter(t => t.status === "done").length;
+        const phaseSkipped = allPhaseTasks.filter(t => t.status === "skipped").length;
         const phaseTotal = allPhaseTasks.length;
+        const statLabel = phaseSkipped === phaseTotal
+          ? `<span style="color: var(--status-skipped);">Skipped / On Hold (${phaseSkipped} Tasks)</span>`
+          : `${phaseDone}/${phaseTotal} Done`;
 
         const card = document.createElement("div");
         card.className = "phase-card";
@@ -1408,7 +1509,7 @@
               <span class="phase-name">${meta.name}</span>
             </div>
             <div class="phase-header-right">
-              <span class="phase-stat">${phaseDone}/${phaseTotal} Done</span>
+              <span class="phase-stat">${statLabel}</span>
               <span class="toggle-arrow">▼</span>
             </div>
           </div>
@@ -1419,21 +1520,24 @@
 
         phaseTasks.forEach(task => {
           const item = document.createElement("div");
-          item.className = `task-item ${task.status === "done" ? "completed" : ""}`;
+          const isDone = task.status === "done";
+          const isSkipped = task.status === "skipped";
+          item.className = `task-item ${isDone ? "completed" : ""} ${isSkipped ? "skipped" : ""}`;
 
           item.innerHTML = `
             <div class="task-left">
-              <input type="checkbox" class="task-checkbox" ${task.status === "done" ? "checked" : ""} onchange="toggleTask('${task.id}')">
+              <input type="checkbox" class="task-checkbox" ${isDone ? "checked" : ""} onchange="toggleTask('${task.id}')">
               <div class="task-content">
                 <h4>${task.title}</h4>
                 <p>${task.desc}</p>
               </div>
             </div>
             <div class="task-right">
-              <span class="priority-badge priority-${task.priority}">${task.priority}</span>
+              <span class="priority-badge ${isSkipped ? 'priority-skipped' : 'priority-' + task.priority}">${isSkipped ? 'Deferred' : task.priority}</span>
               <select class="status-select" onchange="setTaskStatus('${task.id}', this.value)">
                 <option value="pending" ${task.status === "pending" ? "selected" : ""}>Pending</option>
                 <option value="in-progress" ${task.status === "in-progress" ? "selected" : ""}>In Progress</option>
+                <option value="skipped" ${task.status === "skipped" ? "selected" : ""}>Skipped (On Hold)</option>
                 <option value="done" ${task.status === "done" ? "selected" : ""}>Done</option>
               </select>
             </div>

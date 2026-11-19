@@ -176,20 +176,24 @@ PHASE 3: Booking Flow & Arizona Digital Rental Agreement
 ├── Cryptographic SHA-256 Agreement Integrity Hash + Timestamp + IP Capture
 └── Automated Confirmation & Agreement Archival
 
-PHASE 4: 24/7 AI Rental Assistant & Lead Generation Bot
-├── Floating Industrial Chat Widget
-├── Natural Language Equipment Recommendation ("I need to clear 1 acre in Cave Creek")
-├── Math-Locked Pricing Integration (AI uses pricing engine; never invents numbers)
-├── Instant Lead Capture (Name, Phone, Email, Delivery Zip)
-├── 1-Click "Book These Dates" Pre-Fill Transition
-└── Automated Lead Dispatch Notification (Email/SMS to J-Bone)
+PHASE 4: 24/7 AI Rental Assistant & Lead Generation Bot [STATUS: SKIPPED / ON HOLD (Client Decision - Preserved for Future)]
+├── Floating Industrial Chat Widget (On Hold)
+├── Natural Language Equipment Recommendation ("I need to clear 1 acre in Cave Creek") (On Hold)
+├── Math-Locked Pricing Integration (AI uses pricing engine; never invents numbers) (On Hold)
+├── Instant Lead Capture (Name, Phone, Email, Delivery Zip) (On Hold)
+├── 1-Click "Book These Dates" Pre-Fill Transition (On Hold)
+└── Automated Lead Dispatch Notification (Email/SMS to J-Bone) (On Hold)
 
-PHASE 5: Operator CRM & Dispatch Dashboard (`/admin`)
-├── Today's Operations Hub (Units Out, Returning Today, Holds Expiring)
-├── Lead Pipeline Kanban Board (New, Contacted, Quoted, Reserved, Closed)
-├── Visual Fleet Availability Timeline
-├── Maricopa County Permit Pipeline (Import CSV, AI Lead Scoring & SMS Drafts)
-└── Automated Review Booster (Post-Return Google Review SMS trigger)
+PHASE 5: Operator CRM & Dispatch Dashboard (`/admin`) [STATUS: COMPLETE]
+├── Operator Security & Auth Gate (`/admin/login` with admin / azrentaladmin validation) - Complete
+├── Today's Operations Hub & GA4-Style Analytics (Smooth Catmull-Rom Curve, Grounded Guideline) - Complete
+├── Dispatch & Delivery Multi-Date Management (Today, Tomorrow, Yesterday, This Week, Past Records + Date Picker) - Complete
+├── Scalable Paginated Data Tables Across All Pages (Default 10 Entries, Search, Filters) - Complete
+├── Lead Pipeline Kanban Board & Data Table Toggle (New, Contacted, Quoted, Reserved, Closed) - Complete
+├── Visual Fleet Availability Timeline (14-Day Gantt + Bookings Data Table) - Complete
+├── Maricopa County Permit Pipeline (Import CSV, AI Lead Scoring & SMS Drafts) - Complete
+├── Automated Review Booster (Post-Return Google Review SMS trigger) - Complete
+└── System & Operator Settings Page (`/admin/settings` - Logo Scale, Fonts, Timezones, Delivery Fees, Password Management) - Complete
 
 PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
 ├── Vercel Staging Environment Setup & Configuration
@@ -239,7 +243,8 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
      $$\text{SHA-256}(\text{Customer Name} + \text{Timestamp} + \text{IP Address} + \text{Agreement Text} + \text{Signature Vector})$$
      Stored permanently in the database and rendered on the downloadable confirmation receipt.
 
-### Phase 4: 24/7 AI Rental Assistant & Lead Generator
+### Phase 4: 24/7 AI Rental Assistant & Lead Generator [STATUS: SKIPPED / ON HOLD — Client Decision]
+> **Client Directive (Skipped / Preserved):** The client confirmed that a chatbot is not needed for the current launch to maintain a fast, clean, contractor-focused booking experience. This phase is officially skipped / put on hold. All technical requirements, API integrations, and prompt schemas are fully preserved below so they can be activated immediately if the client requests this feature in the future.
 * **Goal:** Turn website visitors into booked jobs 24 hours a day with an intelligent, friendly chat assistant.
 * **Capabilities:**
   1. Understands job requirements: e.g., "I need to level a 10,000 sq ft lot in Cave Creek with rocky soil" -> Recommends CAT 259D3 + Gannon tractor scraper.
@@ -247,22 +252,38 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
   3. Captures lead information (Name, Phone number, Jobsite location) and passes it directly to the CRM.
   4. Provides a 1-click **"Book These Dates"** button that pre-populates the checkout modal.
 
-### Phase 5: Operator CRM & Admin Operations Dashboard (`/admin`)
-* **Goal:** A simple, high-impact operations command center for J-Bone Industries.
-* **Views:**
-  1. **Today's Dispatch:** What equipment is leaving the yard, what is returning, and any overdue machines.
-  2. **Pipeline CRM:** Track leads from Initial Inquiry → Quoted → Agreement Sent → Signed & Reserved → Active Rental → Returned.
-  3. **Permit Pipeline (Maricopa County):** Upload weekly Maricopa County grading and building permits CSV. AI scores each permit for equipment need (e.g., grading = CAT 259D3, pool excavation = track loader & trailer) and drafts personalized outreach text messages.
-  4. **Google Review Booster:** Automatically queues an SMS/Email review request link 24 hours after an equipment return.
+### Phase 5: Operator CRM & Admin Operations Dashboard (`/admin`) [STATUS: 100% COMPLETE]
+* **Goal:** A clean, high-impact operations command center for J-Bone Industries with persistent light sidebar navigation, Red & Gold theme, uniform element heights, and scalable Data Tables ready for future large datasets.
+* **Views & Components Built:**
+  1. **Persistent Sidebar & Layout (`/admin`):** Crisp white sidebar with Red (`#DC2626`) and Gold (`#E5A919`) active states, live Arizona MST clock, clean navigation links, interactive 48-Hr Hold countdown badge, and "+ New Lead" modal.
+  2. **Performance Monitoring Dashboard (`/admin`):** Top 4 rental KPI cards, continuous Google Analytics-style SVG line chart (Revenue / Bookings / Quotes), Equipment fleet breakdown, and scalable Invoices Data Table with live search, status filter, CSV export, and "Show [10/25/50/100] entries" pagination (default 10).
+  3. **Today's Dispatch & Deliveries (`/admin/dispatch`):** Focused single Data Table for outbound deliveries and returns with live search, status filter, and pagination (default 10 entries). Active 48-Hour Reservation Holds cleanly housed in a dedicated, fast modal dialog with 1-click SMS reminder and release actions.
+  4. **Contractor Pipeline CRM (`/admin/pipeline`):** Scalable Data Table (with view toggle to Kanban board) featuring search, 6-stage filter, machine selector, priority badges, and pagination (default 10 entries). Uniform `h-10` header pills for Pipeline Value and Active/Signed totals.
+  5. **Fleet Availability Timeline & Bookings (`/admin/calendar`):** 14-day interactive Gantt schedule + scalable Fleet Bookings Data Table with search, status filter, and pagination (default 10 entries).
+  6. **Maricopa County Permit Pipeline (`/admin/permits`):** Scalable county permits Data Table with match scorer, search, status filter, pagination (default 10 entries), and 1-click AI Outreach SMS Pitch modal.
+  7. **Google Review Booster (`/admin/reviews`):** Scalable 24-hr post-return automated SMS queue Data Table with search, status filter, pagination (default 10 entries), SMS template customizer, and recent verified customer reviews.
+  8. **Fleet & Equipment Pricing Manager (`/admin/fleet`):** Equipment inventory control room with multi-image upload dropzone, angle photo gallery grid, preset machine angle loaders, primary cover photo selection, real-time rate overrides, engine hour meters, and Arizona 811 requirement toggles.
+  9. **System & Operator Settings (`/admin/settings`):** Global controls for company legal entity, logo sizing, Arizona MST timezone, typography scaling, universal deposit & fee rates, and operator password management.
+  10. **Operator User Manual & Interactive Guide (`/admin/manual`):** Beginner-friendly, tabbed operator guide explaining the exact purpose, step-by-step instructions, and operational tips for every page.
+  11. **Branded SweetAlert2 Modal Dialogs:** Custom red & gold confirmation and alert modals replacing native browser alerts throughout the system.
 
-### Phase 6: Vercel Staging & Plesk Production Deployment
+### Phase 6: Database & Backend Architecture (NEXT PHASE — Pending Client UI Approval)
+* **Goal:** Transition the platform from client-side mock/localStorage data into a persistent, production-grade backend engine before production cutover to Plesk.
+* **Key Tasks:**
+  1. **Database Schema & ORM Setup:** Configure Prisma or Drizzle ORM with PostgreSQL or SQLite. Create robust schemas for `Equipment`, `Bookings`, `Holds`, `Invoices`, `Leads`, `CountyPermits`, and `Settings`.
+  2. **Real Data Persistence & API Migration:** Replace `localStorage` operations with secure Next.js Server Actions and REST API routes (`/api/fleet`, `/api/bookings`, `/api/leads`, `/api/settings`).
+  3. **Secure Admin Authentication:** Implement hashed credentials (bcrypt/argon2), JWT session tokens, role-based route protection, and CSRF security.
+  4. **Automated Notification Services:** Connect Twilio SMS API for 48-hour reservation hold expiration warnings and SendGrid/Resend for automated PDF rental agreement receipts.
+  5. **County Permit Scraper API:** Automated sync for Maricopa County excavation permits.
+
+### Phase 7: Plesk Production Deployment & Domain Cutover
 * **Vercel Staging:**
-  * Connect GitHub repository to Vercel for automatic branch previews.
-  * Preview link generated for client review (`azrentalguy.vercel.app`).
-* **Plesk Production Cutover Options:**
-  * **Option A (Node.js Application Manager on Plesk):** Plesk Obsidian natively supports Node.js (v20/v22) via Phusion Passenger. Set Startup file to `node_modules/next/dist/bin/next` or custom `server.js`.
-  * **Option B (Docker Container on Plesk):** Build containerized image running Next.js standalone output and deploy via Plesk Docker extension with automatic port mapping.
-  * **Option C (Next.js Standalone + PM2 with Apache/Nginx Reverse Proxy):** Run `npm run build` with `output: 'standalone'`, manage with PM2, and proxy domain traffic in Plesk to port 3000.
+  * GitHub repository connected: `https://github.com/Aian24/azrentalguy`
+  * Live staging preview: `https://azrentalguy.vercel.app/`
+* **Plesk Production Cutover:**
+  * Option A: Plesk Node.js Application Manager with Phusion Passenger (Node 20+).
+  * Option B: Next.js standalone build managed via PM2 behind Nginx reverse proxy.
+  * SSL Certificate verification and zero-downtime DNS transfer to `azrentalguy.com`.
 
 ---
 
@@ -272,9 +293,11 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
 | :--- | :--- | :--- |
 | **`PLAN.md`** | Master architectural roadmap & requirements specification | Verified in workspace |
 | **`project-tracker.html`** | Interactive solid-color monitoring dashboard with local storage persistence | Open in browser, verify task toggles & metrics |
-| **Next.js Core Application** | Modern frontend, catalog, quote calculator, signature pad, AI chat | Vercel preview & local build verification |
-| **Admin Operations** | Dispatch screen, pipeline board, permit lead scoring | Local test pass & end-to-end booking dry run |
-| **Plesk Transfer Guide** | Step-by-step production cutover documentation | Included in Plan & Tracker |
+| **Next.js Core Application** | Modern frontend, catalog, quote calculator, signature pad | Vercel preview & local build verification |
+| **Phase 4: AI Rental Assistant** | 24/7 Chatbot & automated lead generator | **Skipped / On Hold** per client decision (preserved in plan) |
+| **Phase 5: Admin Operations (`/admin`)** | Full 8-page admin suite (Dispatch, Pipeline, Calendar, Permits, Reviews, Fleet, Settings, Manual) | **100% COMPLETE** & Verified (`npm run build`) |
+| **Phase 6: Database & Backend** | Real database tables, Server Actions, auth, and notification integrations | **READY TO BUILD** (Next Phase upon Client Approval) |
+| **Phase 7: Plesk Transfer** | Production environment configuration & live domain cutover | Documented in Plan & Tracker |
 
 ---
 *Created for J-Bone Industries / AZ Rental Guy project lead & development team.*

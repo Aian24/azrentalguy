@@ -10,6 +10,8 @@
   --brand-yellow-hover: #CA8A04;
   --brand-red: #CA021E;
   --brand-red-hover: #A60218;
+  --app-base-font-size: 14px;
+  --app-logo-height: 36px;
 }
 
 body {

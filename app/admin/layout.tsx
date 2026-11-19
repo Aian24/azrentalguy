@@ -1,0 +1,422 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  BarChart3,
+  Truck,
+  LayoutDashboard,
+  Calendar,
+  FileText,
+  Star,
+  Plus,
+  Phone,
+  Clock,
+  ExternalLink,
+  ShieldCheck,
+  Menu,
+  X,
+  Bell,
+  Search,
+  Settings,
+  LogOut,
+  BookOpen,
+  Wrench,
+} from "lucide-react";
+import { COMPANY_INFO } from "@/lib/fleet";
+import PhoneInLeadModal from "@/components/admin/PhoneInLeadModal";
+import { PipelineLead, INITIAL_HOLDS, ActiveHold } from "@/lib/admin-data";
+import { getStoredSettings, applySettingsToDOM, AppSettings } from "@/lib/settings";
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+  const [azTime, setAzTime] = useState("");
+  const [appSettings, setAppSettings] = useState<AppSettings>(getStoredSettings());
+
+  // WORKING 48-HR HOLDS NOTIFICATION POPOVER STATE
+  const [isHoldsDropdownOpen, setIsHoldsDropdownOpen] = useState(false);
+  const [holdsList, setHoldsList] = useState<ActiveHold[]>(INITIAL_HOLDS);
+  const holdsRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (holdsRef.current && !holdsRef.current.contains(event.target as Node)) {
+        setIsHoldsDropdownOpen(false);
+      }
+    };
+    if (isHoldsDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isHoldsDropdownOpen]);
+
+  // AUTHENTICATION GUARD
+  useEffect(() => {
+    if (pathname === "/admin/login") {
+      setIsAuthenticated(true);
+      return;
+    }
+
+    const checkAuth = () => {
+      const auth = localStorage.getItem("az_admin_auth");
+      if (auth === "true") {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        router.push("/admin/login");
+      }
+    };
+
+    checkAuth();
+  }, [pathname, router]);
+
+  // LIVE SETTINGS SYNC (LOGO, COMPANY NAME, TIME ZONE, FONTS)
+  useEffect(() => {
+    const syncSettings = () => {
+      const s = getStoredSettings();
+      setAppSettings(s);
+      applySettingsToDOM(s);
+    };
+
+    syncSettings();
+    window.addEventListener("app_settings_updated", syncSettings);
+    return () => window.removeEventListener("app_settings_updated", syncSettings);
+  }, []);
+
+  // REAL-TIME OPERATIONAL CLOCK
+  useEffect(() => {
+    const updateTime = () => {
+      try {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString("en-US", {
+          timeZone: appSettings.timeZone || "America/Phoenix",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: appSettings.timeFormat !== "24h",
+        });
+        setAzTime(timeStr);
+      } catch {
+        setAzTime("7:00 AM");
+      }
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, [appSettings.timeZone, appSettings.timeFormat]);
+
+  const navItems = [
+    { label: "Dashboard", href: "/admin", icon: BarChart3, badge: "Live" },
+    { label: "Dispatch", href: "/admin/dispatch", icon: Truck, badge: "3" },
+    { label: "Pipeline", href: "/admin/pipeline", icon: LayoutDashboard, badge: "6" },
+    { label: "Calendar", href: "/admin/calendar", icon: Calendar, badge: "14-Day" },
+    { label: "Fleet & Pricing", href: "/admin/fleet", icon: Wrench, badge: "Fleet" },
+    { label: "Permits", href: "/admin/permits", icon: FileText, badge: "3" },
+    { label: "Reviews", href: "/admin/reviews", icon: Star, badge: "5.0" },
+    { label: "Settings", href: "/admin/settings", icon: Settings, badge: "System" },
+    { label: "User Manual", href: "/admin/manual", icon: BookOpen, badge: "Guide" },
+  ];
+
+  const handleLeadCreated = (newLead: PipelineLead) => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("az_admin_leads");
+        const list = stored ? JSON.parse(stored) : [];
+        list.unshift(newLead);
+        localStorage.setItem("az_admin_leads", JSON.stringify(list));
+        window.dispatchEvent(new Event("admin_data_updated"));
+      } catch (err) {
+        console.error("Failed to store lead", err);
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("az_admin_auth");
+      document.cookie = "az_admin_auth=; path=/; max-age=0";
+      router.push("/admin/login");
+    }
+  };
+
+  // IF ON LOGIN PAGE, RENDER CHILDREN CLEANLY WITHOUT SIDEBAR/HEADER
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  // IF CHECKING AUTHENTICATION, SHOW BRIEF LOADING SCREEN
+  if (isAuthenticated === null || isAuthenticated === false) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 border-4 border-yellow-500 border-t-red-600 rounded-full animate-spin mb-3" />
+        <span className="text-xs font-black text-gray-800 tracking-wider uppercase">
+          Verifying Operator Security...
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex text-gray-900 font-sans">
+      {/* MOBILE BACKDROP */}
+      {mobileSidebarOpen && (
+        <div
+          onClick={() => setMobileSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-gray-900/50 md:hidden"
+        />
+      )}
+
+      {/* MODERN LIGHT SIDEBAR WITH DYNAMIC BRANDING */}
+      <aside
+        className={`fixed md:sticky top-0 left-0 z-50 h-screen w-72 bg-white border-r border-gray-200 flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xs ${
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
+        <div className="overflow-y-auto">
+          {/* LOGO HEADER */}
+          <div className="p-4 border-b border-gray-200 bg-white flex items-center justify-between">
+            <Link href="/admin" className="flex items-center gap-2.5 group">
+              <img
+                src={appSettings.logoUrl}
+                alt={appSettings.companyName}
+                style={{ height: `${appSettings.logoSize}px` }}
+                className="w-auto object-contain transition-transform group-hover:scale-105"
+              />
+              <div>
+                <span className="text-red-600 font-black text-base sm:text-lg tracking-tight block leading-none">
+                  {appSettings.companyName.toUpperCase()}
+                </span>
+                <span className="text-xs font-extrabold text-yellow-600 uppercase tracking-wider block mt-1">
+                  Operator Admin Hub
+                </span>
+              </div>
+            </Link>
+            <button
+              onClick={() => setMobileSidebarOpen(false)}
+              className="md:hidden text-gray-500 hover:text-gray-900 p-1 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* QUICK STATUS */}
+          <div className="px-4 py-2.5 bg-yellow-50/60 border-b border-gray-100 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span className="text-gray-800 font-semibold text-xs">Cave Creek Yard</span>
+            </div>
+            <span className="text-red-600 font-black text-xs tracking-wide">YARD OPEN</span>
+          </div>
+
+          {/* CTA: NEW LEAD MODAL */}
+          <div className="p-3.5">
+            <button
+              onClick={() => setIsPhoneModalOpen(true)}
+              className="w-full bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-black py-2.5 px-4 rounded text-sm flex items-center justify-center gap-2 shadow-xs transition-all duration-150 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Lead / Hold</span>
+            </button>
+          </div>
+
+          {/* NAV ITEMS WITH LARGER FONT SIZES */}
+          <nav className="px-3 space-y-1.5 pb-4">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                item.href === "/admin"
+                  ? pathname === "/admin"
+                  : pathname.startsWith(item.href);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileSidebarOpen(false)}
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded text-sm font-bold transition-all duration-200 cursor-pointer active:scale-[0.98] ${
+                    isActive
+                      ? "bg-red-50 text-red-600 border-l-4 border-red-600 shadow-xs translate-x-1 font-black"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-950 hover:translate-x-1.5 hover:shadow-2xs"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon
+                      className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                        isActive ? "text-red-600" : "text-yellow-600"
+                      }`}
+                    />
+                    <span className="text-sm font-extrabold tracking-tight">{item.label}</span>
+                  </div>
+                  <span
+                    className={`text-xs px-2.5 py-0.5 rounded font-black tracking-wide ${
+                      isActive
+                        ? "bg-red-600 text-white"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* BOTTOM SHORTCUTS & OPERATOR LOGOUT */}
+        <div className="p-4 border-t border-gray-200 bg-gray-50/70 space-y-2.5">
+          <Link
+            href="/"
+            target="_blank"
+            className="flex items-center justify-between text-gray-800 hover:text-red-600 bg-white border border-gray-200 px-3.5 py-2 rounded transition-all duration-150 text-xs font-bold hover:shadow-xs"
+          >
+            <span className="flex items-center gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-yellow-600" />
+              Live Website
+            </span>
+            <span className="text-[11px] text-red-600 font-extrabold bg-red-50 px-2 py-0.2 rounded">
+              AZ
+            </span>
+          </Link>
+
+          {/* OPERATOR SIGN OUT */}
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full flex items-center justify-between text-gray-700 hover:text-red-700 bg-white border border-gray-200 hover:border-red-300 px-3.5 py-2 rounded transition-all duration-150 text-xs font-bold hover:bg-red-50 cursor-pointer"
+          >
+            <span className="flex items-center gap-2">
+              <LogOut className="w-3.5 h-3.5 text-red-600" />
+              Operator Sign Out
+            </span>
+            <span className="text-[10px] uppercase font-bold text-gray-400">Lock</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTAINER */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* TOP BAR */}
+        <header className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="md:hidden p-1.5 text-gray-700 hover:text-gray-950 border border-gray-300 rounded cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <span className="font-bold text-sm text-gray-900">
+              {appSettings.companyName} • Operations & Analytics
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded text-xs">
+              <Clock className="w-3.5 h-3.5 text-yellow-600" />
+              <span className="text-gray-600 font-medium">Zone:</span>
+              <span className="text-gray-950 font-bold">{azTime || "7:00 AM"}</span>
+            </div>
+
+            {/* INTERACTIVE WORKING 48-HR HOLDS NOTIFICATION CENTER */}
+            <div ref={holdsRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setIsHoldsDropdownOpen(!isHoldsDropdownOpen)}
+                className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 px-3 py-1.5 rounded text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-[0.98]"
+                title="Click to view Active 48-Hour Reservation Holds"
+              >
+                <Bell className="w-3.5 h-3.5 text-red-600 animate-bounce" />
+                <span>{holdsList.length} Holds</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+              </button>
+
+              {/* HOLDS DROPDOWN NOTIFICATION POPOVER */}
+              {isHoldsDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white border-2 border-yellow-500 rounded-lg shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95">
+                  <div className="bg-yellow-500 px-4 py-2.5 flex items-center justify-between text-gray-950">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-gray-950" />
+                      <span className="font-black text-xs uppercase tracking-tight">
+                        Active 48-Hr Holds ({holdsList.length} Units)
+                      </span>
+                    </div>
+                    <span className="text-[10px] bg-red-600 text-white font-black px-1.5 py-0.5 rounded">
+                      Expiring Soon
+                    </span>
+                  </div>
+
+                  <div className="divide-y divide-gray-100 max-h-72 overflow-y-auto">
+                    {holdsList.map((hold) => (
+                      <div
+                        key={hold.id}
+                        className="p-3 hover:bg-yellow-50/40 transition-colors flex items-start justify-between gap-2"
+                      >
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-gray-950 text-xs">
+                              {hold.customerName}
+                            </span>
+                            <span className="text-[10px] text-gray-400 font-mono">
+                              ({hold.id})
+                            </span>
+                          </div>
+                          <span className="text-xs text-gray-600 block mt-0.5 font-medium">
+                            {hold.equipmentName}
+                          </span>
+                          <span className="text-[11px] text-gray-400 font-medium block">
+                            {hold.startDate} → {hold.endDate}
+                          </span>
+                        </div>
+
+                        <div className="text-right flex-shrink-0">
+                          <span className="text-xs font-black text-red-600 block">
+                            {hold.hoursRemaining}h left
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold px-1.5 py-0.2 rounded inline-block mt-1 ${
+                              hold.signatureStatus === "signed"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {hold.signatureStatus === "signed" ? "Signed" : "Pending Signature"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-2.5 bg-gray-50 border-t border-gray-200 text-center">
+                    <Link
+                      href="/admin/dispatch"
+                      onClick={() => setIsHoldsDropdownOpen(false)}
+                      className="text-xs font-black text-red-600 hover:text-red-800 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Manage All Holds & Dispatches in Dispatch Hub →</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* PAGE CONTENT */}
+        <main className="p-4 sm:p-6 lg:p-6 flex-1 overflow-x-auto">
+          {children}
+        </main>
+      </div>
+
+      {/* FAST LEAD MODAL */}
+      <PhoneInLeadModal
+        isOpen={isPhoneModalOpen}
+        onClose={() => setIsPhoneModalOpen(false)}
+        onLeadCreated={handleLeadCreated}
+      />
+    </div>
+  );
+}

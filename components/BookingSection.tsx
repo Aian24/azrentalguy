@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { FLEET, COMPANY_INFO } from "@/lib/fleet";
+import { FLEET, COMPANY_INFO, EquipmentItem, getStoredFleet } from "@/lib/fleet";
 import { calculateQuote } from "@/lib/pricing";
 import { Calendar, ShieldAlert, CheckCircle, Truck, Phone, ShieldCheck, Check, Tag, PenTool } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -10,6 +10,7 @@ import SwalModal from "@/components/SwalModal";
 
 export default function BookingSection() {
   const [selectedMachineId, setSelectedMachineId] = useState("cat-259d3");
+  const [fleetList, setFleetList] = useState<EquipmentItem[]>(FLEET);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [deliveryIncluded, setDeliveryIncluded] = useState(true);
@@ -44,6 +45,15 @@ export default function BookingSection() {
   });
 
   useEffect(() => {
+    const list = getStoredFleet();
+    setFleetList(list);
+
+    const handleSync = () => {
+      setFleetList(getStoredFleet());
+    };
+    window.addEventListener("az_fleet_updated", handleSync);
+    window.addEventListener("storage", handleSync);
+
     const today = new Date();
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
@@ -58,13 +68,14 @@ export default function BookingSection() {
         const hashQuery = window.location.hash.split("?")[1];
         eqParam = new URLSearchParams(hashQuery).get("equipment");
       }
-      if (eqParam && FLEET.some((m) => m.id === eqParam)) {
+      if (eqParam && list.some((m) => m.id === eqParam)) {
         setSelectedMachineId(eqParam);
       }
 
       const handleCustomSelect = (e: Event) => {
         const customEvent = e as CustomEvent<string>;
-        if (customEvent.detail && FLEET.some((m) => m.id === customEvent.detail)) {
+        const current = getStoredFleet();
+        if (customEvent.detail && current.some((m) => m.id === customEvent.detail)) {
           setSelectedMachineId(customEvent.detail);
         }
       };
@@ -72,11 +83,13 @@ export default function BookingSection() {
       window.addEventListener("select-equipment", handleCustomSelect);
       return () => {
         window.removeEventListener("select-equipment", handleCustomSelect);
+        window.removeEventListener("az_fleet_updated", handleSync);
+        window.removeEventListener("storage", handleSync);
       };
     }
   }, []);
 
-  const machine = FLEET.find((m) => m.id === selectedMachineId) || FLEET[0];
+  const machine = fleetList.find((m) => m.id === selectedMachineId) || fleetList[0] || FLEET[0];
 
   // Dynamic calculations via master pricing engine
   const quote = calculateQuote({
@@ -246,7 +259,7 @@ export default function BookingSection() {
                       onChange={(e) => setSelectedMachineId(e.target.value)}
                       className="w-full bg-gray-50 hover:bg-white focus:bg-white border-2 border-gray-300 rounded-xl p-3.5 text-sm font-bold text-gray-950 focus:border-red-600 transition-all outline-none cursor-pointer"
                     >
-                      {FLEET.map((m) => (
+                      {fleetList.map((m) => (
                         <option key={m.id} value={m.id}>
                           {m.name} — ${m.dailyRate}/day (${m.weeklyRate}/wk)
                         </option>
