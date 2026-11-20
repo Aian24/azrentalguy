@@ -20,7 +20,7 @@ import {
   ArrowRight,
   Download,
 } from "lucide-react";
-import { INITIAL_LEADS, PipelineLead } from "@/lib/admin-data";
+import { INITIAL_LEADS, PipelineLead, isDemoData, purgeDemoStorage } from "@/lib/admin-data";
 import { FLEET } from "@/lib/fleet";
 import PhoneInLeadModal from "@/components/admin/PhoneInLeadModal";
 
@@ -40,7 +40,12 @@ export default function LeadPipelinePage() {
         const stored = localStorage.getItem("az_admin_leads");
         if (stored) {
           const parsed = JSON.parse(stored);
-          setLeads(parsed);
+          if (isDemoData(parsed)) {
+            purgeDemoStorage();
+            setLeads([]);
+          } else {
+            setLeads(parsed);
+          }
         } else {
           setLeads(INITIAL_LEADS);
         }

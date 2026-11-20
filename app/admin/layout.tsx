@@ -30,7 +30,13 @@ import {
 } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/fleet";
 import PhoneInLeadModal from "@/components/admin/PhoneInLeadModal";
-import { PipelineLead, INITIAL_HOLDS, ActiveHold } from "@/lib/admin-data";
+import {
+  PipelineLead,
+  INITIAL_HOLDS,
+  ActiveHold,
+  isDemoData,
+  purgeDemoStorage,
+} from "@/lib/admin-data";
 import { getStoredSettings, applySettingsToDOM, AppSettings } from "@/lib/settings";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -43,6 +49,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [azTime, setAzTime] = useState("");
   const [appSettings, setAppSettings] = useState<AppSettings>(getStoredSettings());
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // DYNAMIC COUNTS FOR SIDEBAR & TOPBAR
+  const [dispatchCount, setDispatchCount] = useState(0);
+  const [pipelineCount, setPipelineCount] = useState(0);
+  const [permitCount, setPermitCount] = useState(0);
 
   useEffect(() => {
     try {
@@ -67,6 +78,72 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isHoldsDropdownOpen, setIsHoldsDropdownOpen] = useState(false);
   const [holdsList, setHoldsList] = useState<ActiveHold[]>(INITIAL_HOLDS);
   const holdsRef = React.useRef<HTMLDivElement>(null);
+
+  // AUTO-PURGE DEMO DATA AND SYNC LIVE COUNTS
+  useEffect(() => {
+    const syncDataCounts = () => {
+      try {
+        const storedHolds = localStorage.getItem("az_admin_holds");
+        const storedLeads = localStorage.getItem("az_admin_leads");
+        const storedDispatch = localStorage.getItem("az_admin_dispatch");
+        const storedPermits = localStorage.getItem("az_admin_permits");
+        const storedInvoices = localStorage.getItem("az_admin_invoices");
+
+        let hasDemo = false;
+        if (storedHolds && isDemoData(JSON.parse(storedHolds))) hasDemo = true;
+        if (storedLeads && isDemoData(JSON.parse(storedLeads))) hasDemo = true;
+        if (storedDispatch && isDemoData(JSON.parse(storedDispatch))) hasDemo = true;
+        if (storedPermits && isDemoData(JSON.parse(storedPermits))) hasDemo = true;
+        if (storedInvoices && isDemoData(JSON.parse(storedInvoices))) hasDemo = true;
+
+        if (hasDemo) {
+          purgeDemoStorage();
+          setHoldsList([]);
+          setDispatchCount(0);
+          setPipelineCount(0);
+          setPermitCount(0);
+          return;
+        }
+
+        if (storedHolds) {
+          setHoldsList(JSON.parse(storedHolds));
+        } else {
+          setHoldsList([]);
+        }
+
+        if (storedDispatch) {
+          setDispatchCount(JSON.parse(storedDispatch).length);
+        } else {
+          setDispatchCount(0);
+        }
+
+        if (storedLeads) {
+          setPipelineCount(JSON.parse(storedLeads).length);
+        } else {
+          setPipelineCount(0);
+        }
+
+        if (storedPermits) {
+          setPermitCount(JSON.parse(storedPermits).length);
+        } else {
+          setPermitCount(0);
+        }
+      } catch {
+        setHoldsList([]);
+        setDispatchCount(0);
+        setPipelineCount(0);
+        setPermitCount(0);
+      }
+    };
+
+    syncDataCounts();
+    window.addEventListener("admin_data_updated", syncDataCounts);
+    window.addEventListener("az_admin_purged", syncDataCounts);
+    return () => {
+      window.removeEventListener("admin_data_updated", syncDataCounts);
+      window.removeEventListener("az_admin_purged", syncDataCounts);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -136,11 +213,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { label: "Dashboard", href: "/admin", icon: BarChart3, badge: "Live" },
-    { label: "Dispatch", href: "/admin/dispatch", icon: Truck, badge: "3" },
-    { label: "Pipeline", href: "/admin/pipeline", icon: LayoutDashboard, badge: "6" },
+    { label: "Dispatch", href: "/admin/dispatch", icon: Truck, badge: String(dispatchCount) },
+    { label: "Pipeline", href: "/admin/pipeline", icon: LayoutDashboard, badge: String(pipelineCount) },
     { label: "Calendar", href: "/admin/calendar", icon: Calendar, badge: "14-Day" },
-    { label: "Fleet & Pricing", href: "/admin/fleet", icon: Wrench, badge: "Fleet" },
-    { label: "Permits", href: "/admin/permits", icon: FileText, badge: "3" },
+    { label: "Fleet & Pricing", href: "/admin/fleet", icon: Wrench, badge: "5 Units" },
+    { label: "Permits", href: "/admin/permits", icon: FileText, badge: String(permitCount) },
     { label: "Reviews", href: "/admin/reviews", icon: Star, badge: "5.0" },
     { label: "Settings", href: "/admin/settings", icon: Settings, badge: "System" },
     { label: "User Manual", href: "/admin/manual", icon: BookOpen, badge: "Guide" },
@@ -400,12 +477,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <button
                 type="button"
                 onClick={() => setIsHoldsDropdownOpen(!isHoldsDropdownOpen)}
-                className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 px-3 py-1.5 rounded text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-[0.98]"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-black transition-all cursor-pointer shadow-2xs active:scale-[0.98] ${
+                  holdsList.length > 0
+                    ? "bg-red-50 hover:bg-red-100 border border-red-300 text-red-700"
+                    : "bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700"
+                }`}
                 title="Click to view Active 48-Hour Reservation Holds"
               >
-                <Bell className="w-3.5 h-3.5 text-red-600 animate-bounce" />
-                <span>{holdsList.length} Holds</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                <Bell className={`w-3.5 h-3.5 ${holdsList.length > 0 ? "text-red-600 animate-bounce" : "text-gray-500"}`} />
+                <span>{holdsList.length} {holdsList.length === 1 ? "Hold" : "Holds"}</span>
+                {holdsList.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />}
               </button>
 
               {/* HOLDS DROPDOWN NOTIFICATION POPOVER */}
@@ -418,49 +499,62 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         Active 48-Hr Holds ({holdsList.length} Units)
                       </span>
                     </div>
-                    <span className="text-[10px] bg-red-600 text-white font-black px-1.5 py-0.5 rounded">
-                      Expiring Soon
-                    </span>
+                    {holdsList.length > 0 && (
+                      <span className="text-[10px] bg-red-600 text-white font-black px-1.5 py-0.5 rounded">
+                        Expiring Soon
+                      </span>
+                    )}
                   </div>
 
                   <div className="divide-y divide-gray-100 max-h-72 overflow-y-auto">
-                    {holdsList.map((hold) => (
-                      <div
-                        key={hold.id}
-                        className="p-3 hover:bg-yellow-50/40 transition-colors flex items-start justify-between gap-2"
-                      >
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-gray-950 text-xs">
-                              {hold.customerName}
+                    {holdsList.length === 0 ? (
+                      <div className="py-8 px-4 text-center">
+                        <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                        <p className="text-xs font-bold text-gray-700">No Active Holds</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">
+                          New equipment reservation holds will appear here.
+                        </p>
+                      </div>
+                    ) : (
+                      holdsList.map((hold) => (
+                        <div
+                          key={hold.id}
+                          className="p-3 hover:bg-yellow-50/40 transition-colors flex items-start justify-between gap-2"
+                        >
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-gray-950 text-xs">
+                                {hold.customerName}
+                              </span>
+                              <span className="text-[10px] text-gray-400 font-mono">
+                                ({hold.id})
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-600 block mt-0.5 font-medium">
+                              {hold.equipmentName}
                             </span>
-                            <span className="text-[10px] text-gray-400 font-mono">
-                              ({hold.id})
+                            <span className="text-[11px] text-gray-400 font-medium block">
+                              {hold.startDate} → {hold.endDate}
                             </span>
                           </div>
-                          <span className="text-xs text-gray-600 block mt-0.5 font-medium">
-                            {hold.equipmentName}
-                          </span>
-                          <span className="text-[11px] text-gray-400 font-medium block">
-                            {hold.startDate} → {hold.endDate}
-                          </span>
-                        </div>
 
-                        <div className="text-right flex-shrink-0">
-                          <span className="text-xs font-black text-red-600 block">
-                            {hold.hoursRemaining}h left
-                          </span>
-                          <span
-                            className={`text-[10px] font-bold px-1.5 py-0.2 rounded inline-block mt-1 ${hold.signatureStatus === "signed"
-                                ? "bg-emerald-100 text-emerald-800"
-                                : "bg-red-100 text-red-800"
+                          <div className="text-right flex-shrink-0">
+                            <span className="text-xs font-black text-red-600 block">
+                              {hold.hoursRemaining}h left
+                            </span>
+                            <span
+                              className={`text-[10px] font-bold px-1.5 py-0.2 rounded inline-block mt-1 ${
+                                hold.signatureStatus === "signed"
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : "bg-red-100 text-red-800"
                               }`}
-                          >
-                            {hold.signatureStatus === "signed" ? "Signed" : "Pending Signature"}
-                          </span>
+                            >
+                              {hold.signatureStatus === "signed" ? "Signed" : "Pending Signature"}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
 
                   <div className="p-2.5 bg-gray-50 border-t border-gray-200 text-center">

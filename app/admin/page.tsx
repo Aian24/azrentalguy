@@ -23,21 +23,64 @@ import {
   MapPin,
 } from "lucide-react";
 import { FLEET } from "@/lib/fleet";
-import { INITIAL_SALES_TRANSACTIONS, SalesTransaction } from "@/lib/admin-data";
+import {
+  INITIAL_SALES_TRANSACTIONS,
+  SalesTransaction,
+  ActiveHold,
+  INITIAL_HOLDS,
+  isDemoData,
+  purgeDemoStorage,
+} from "@/lib/admin-data";
 import PhoneInLeadModal from "@/components/admin/PhoneInLeadModal";
+import { RotateCcw } from "lucide-react";
 
 export default function RentalDashboardPage() {
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "1y">("30d");
   const [activeMetric, setActiveMetric] = useState<"revenue" | "bookings" | "quotes">("revenue");
-  const [hoveredIndex, setHoveredIndex] = useState<number>(18); // Default to Peak (Nov 19)
+  const [hoveredIndex, setHoveredIndex] = useState<number>(3);
   const [isHoveringChart, setIsHoveringChart] = useState(false);
   const [transactions, setTransactions] = useState<SalesTransaction[]>(INITIAL_SALES_TRANSACTIONS);
+  const [holds, setHolds] = useState<ActiveHold[]>(INITIAL_HOLDS);
   const [tableSearch, setTableSearch] = useState("");
   const [tableStatus, setTableStatus] = useState("all");
   const [tablePage, setTablePage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+
+  // Auto-purge demo development data on initial load
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("az_admin_invoices");
+      const storedHolds = localStorage.getItem("az_admin_holds");
+      let shouldPurge = false;
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (isDemoData(parsed)) shouldPurge = true;
+        else setTransactions(parsed);
+      } else {
+        setTransactions([]);
+      }
+
+      if (storedHolds) {
+        const parsed = JSON.parse(storedHolds);
+        if (isDemoData(parsed)) shouldPurge = true;
+        else setHolds(parsed);
+      } else {
+        setHolds([]);
+      }
+
+      if (shouldPurge) {
+        purgeDemoStorage();
+        setTransactions([]);
+        setHolds([]);
+      }
+    } catch {
+      setTransactions([]);
+      setHolds([]);
+    }
+  }, []);
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -46,36 +89,15 @@ export default function RentalDashboardPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // 28-DAY RENTAL PERFORMANCE DATA (FOR CONTINUOUS LINE GRAPH)
+  // 28-DAY RENTAL PERFORMANCE DATA (BASELINE ZERO FOR LIVE PRODUCTION)
   const lineData = [
-    { day: "Nov 01", rev: 1150, bookings: 1, quotes: 8, y: 72 },
-    { day: "Nov 02", rev: 1450, bookings: 2, quotes: 9, y: 66 },
-    { day: "Nov 03", rev: 1300, bookings: 1, quotes: 7, y: 70 },
-    { day: "Nov 04", rev: 1650, bookings: 2, quotes: 11, y: 62 },
-    { day: "Nov 05", rev: 1950, bookings: 2, quotes: 14, y: 56 },
-    { day: "Nov 06", rev: 1250, bookings: 1, quotes: 8, y: 70 },
-    { day: "Nov 07", rev: 1400, bookings: 1, quotes: 10, y: 67 },
-    { day: "Nov 08", rev: 2100, bookings: 2, quotes: 15, y: 53 },
-    { day: "Nov 09", rev: 1350, bookings: 1, quotes: 9, y: 68 },
-    { day: "Nov 10", rev: 1800, bookings: 2, quotes: 12, y: 59 },
-    { day: "Nov 11", rev: 2300, bookings: 2, quotes: 16, y: 49 },
-    { day: "Nov 12", rev: 1650, bookings: 1, quotes: 11, y: 62 },
-    { day: "Nov 13", rev: 1900, bookings: 2, quotes: 13, y: 57 },
-    { day: "Nov 14", rev: 1450, bookings: 1, quotes: 8, y: 66 },
-    { day: "Nov 15", rev: 1750, bookings: 2, quotes: 12, y: 60 },
-    { day: "Nov 16", rev: 2200, bookings: 2, quotes: 15, y: 51 },
-    { day: "Nov 17", rev: 2850, bookings: 3, quotes: 19, y: 38 },
-    { day: "Nov 18", rev: 3400, bookings: 3, quotes: 22, y: 27 },
-    { day: "Nov 19", rev: 4450, bookings: 4, quotes: 28, y: 6 }, // Peak Day
-    { day: "Nov 20", rev: 3100, bookings: 3, quotes: 20, y: 33 },
-    { day: "Nov 21", rev: 1850, bookings: 2, quotes: 13, y: 58 },
-    { day: "Nov 22", rev: 1950, bookings: 2, quotes: 14, y: 56 },
-    { day: "Nov 23", rev: 2150, bookings: 2, quotes: 15, y: 52 },
-    { day: "Nov 24", rev: 1700, bookings: 1, quotes: 11, y: 61 },
-    { day: "Nov 25", rev: 1600, bookings: 1, quotes: 10, y: 63 },
-    { day: "Nov 26", rev: 1900, bookings: 2, quotes: 13, y: 57 },
-    { day: "Nov 27", rev: 1750, bookings: 2, quotes: 12, y: 60 },
-    { day: "Nov 28", rev: 2100, bookings: 2, quotes: 14, y: 53 },
+    { day: "Nov 01", rev: 0, bookings: 0, quotes: 0, y: 72 },
+    { day: "Nov 05", rev: 0, bookings: 0, quotes: 0, y: 72 },
+    { day: "Nov 10", rev: 0, bookings: 0, quotes: 0, y: 72 },
+    { day: "Nov 15", rev: 0, bookings: 0, quotes: 0, y: 72 },
+    { day: "Nov 20", rev: 0, bookings: 0, quotes: 0, y: 72 },
+    { day: "Nov 25", rev: 0, bookings: 0, quotes: 0, y: 72 },
+    { day: "Nov 28", rev: 0, bookings: 0, quotes: 0, y: 72 },
   ];
 
   // Catmull-Rom to Cubic Bezier spline interpolation for silky smooth continuous curve
@@ -201,6 +223,19 @@ export default function RentalDashboardPage() {
           </div>
 
           <button
+            onClick={() => {
+              purgeDemoStorage();
+              setTransactions([]);
+              showToast("Demo data cleared. Dashboard is reset to clean production baseline.");
+            }}
+            className="h-10 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-bold px-3 rounded text-xs flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+            title="Clear cached demo records from browser"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-gray-500" />
+            <span className="hidden sm:inline">Clear Demo Data</span>
+          </button>
+
+          <button
             onClick={() => setIsPhoneModalOpen(true)}
             className="h-10 bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-bold px-4 rounded text-xs flex items-center gap-1.5 transition-all shadow-xs"
           >
@@ -226,11 +261,11 @@ export default function RentalDashboardPage() {
             <DollarSign className="w-4 h-4 text-red-600" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-gray-950 mt-1 tracking-tight">
-            $34,850
+            ${transactions.reduce((acc, t) => acc + (t.status === "Paid" ? t.amount : 0), 0).toLocaleString()}
           </div>
-          <div className="flex items-center gap-1 text-xs font-bold text-red-700 mt-1">
-            <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>+18.4% vs last period</span>
+          <div className="flex items-center gap-1 text-xs font-bold text-gray-500 mt-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Live Verified Sales</span>
           </div>
         </div>
 
@@ -248,10 +283,10 @@ export default function RentalDashboardPage() {
             <Calendar className="w-4 h-4 text-yellow-600" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-gray-950 mt-1 tracking-tight">
-            29 Rentals
+            {transactions.length} Rentals
           </div>
           <div className="text-xs text-gray-500 font-medium mt-1">
-            Avg Order: $1,245
+            Ready for reservations
           </div>
         </div>
 
@@ -269,10 +304,10 @@ export default function RentalDashboardPage() {
             <Activity className="w-4 h-4 text-red-600" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-gray-950 mt-1 tracking-tight">
-            240 Runs
+            0 Runs
           </div>
-          <div className="text-xs text-red-700 font-bold mt-1">
-            12% Hold Conversion Rate
+          <div className="text-xs text-gray-500 font-medium mt-1">
+            Ready for online holds
           </div>
         </div>
 
@@ -287,11 +322,11 @@ export default function RentalDashboardPage() {
               <Truck className="w-4 h-4 text-yellow-600" />
             </div>
             <div className="text-2xl sm:text-3xl font-black text-gray-950 mt-1 tracking-tight">
-              3 of 5 Units
+              0 of {FLEET.length} Units
             </div>
           </div>
-          <div className="text-xs font-bold text-yellow-700 flex items-center justify-between mt-1">
-            <span>76% Capacity</span>
+          <div className="text-xs font-bold text-emerald-700 flex items-center justify-between mt-1">
+            <span>All 5 Units Available in Yard</span>
             <span className="text-red-600 font-black">Open Dispatch →</span>
           </div>
         </Link>
@@ -377,7 +412,7 @@ export default function RentalDashboardPage() {
                 ? `${currentItem.bookings} bookings`
                 : `${currentItem.quotes} quotes`}
             </span>
-            {hoveredIndex === 18 && (
+            {currentItem.rev > 0 && hoveredIndex === 18 && (
               <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.2 rounded font-black uppercase">
                 Peak
               </span>
@@ -472,10 +507,10 @@ export default function RentalDashboardPage() {
           {/* X-AXIS TIMELINE LABELS (RESPONSIVE NO-WRAP) */}
           <div className="flex justify-between text-[11px] sm:text-xs text-gray-500 font-medium pt-2 border-t border-gray-200 w-[92%]">
             <span>Nov 01</span>
-            <span className="hidden sm:inline">Nov 08</span>
-            <span className="hidden xs:inline">Nov 15</span>
-            <span className="font-black text-red-600">Nov 19 (Peak)</span>
-            <span className="hidden sm:inline">Nov 24</span>
+            <span className="hidden sm:inline">Nov 05</span>
+            <span className="hidden xs:inline">Nov 10</span>
+            <span>Nov 15</span>
+            <span className="hidden sm:inline">Nov 20</span>
             <span>Nov 28</span>
           </div>
         </div>
@@ -484,11 +519,11 @@ export default function RentalDashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-gray-100 text-sm">
           <div>
             <span className="text-gray-400 block text-xs">Peak Day Sales</span>
-            <span className="font-black text-gray-950 text-base">$4,450 (Nov 19)</span>
+            <span className="font-black text-gray-950 text-base">$0</span>
           </div>
           <div>
             <span className="text-gray-400 block text-xs">Avg Daily Rate</span>
-            <span className="font-black text-gray-950 text-base">$1,245 / job</span>
+            <span className="font-black text-gray-950 text-base">$0 / job</span>
           </div>
           <div>
             <span className="text-gray-400 block text-xs">Delivery Flat Fee</span>
@@ -496,7 +531,7 @@ export default function RentalDashboardPage() {
           </div>
           <div>
             <span className="text-gray-400 block text-xs">Holds Converted</span>
-            <span className="font-black text-red-600 text-base">92% Sign Rate</span>
+            <span className="font-black text-red-600 text-base">0% Sign Rate</span>
           </div>
         </div>
       </div>
@@ -526,22 +561,9 @@ export default function RentalDashboardPage() {
 
           <div className="divide-y divide-gray-100">
             {FLEET.map((machine) => {
-              const rev =
-                machine.id === "cat-259d3"
-                  ? 14200
-                  : machine.id === "cat-226d3"
-                  ? 8400
-                  : machine.id === "john-deere-4044m"
-                  ? 6500
-                  : machine.id === "trailer-gooseneck"
-                  ? 3650
-                  : 2100;
-
-              const pct = Math.round((rev / 34850) * 100);
-              const isOnJobsite =
-                machine.id === "cat-259d3" ||
-                machine.id === "john-deere-4044m" ||
-                machine.id === "wt5c-water-trailer";
+              const rev = 0;
+              const pct = 0;
+              const isOnJobsite = false;
 
               return (
                 <div
@@ -566,14 +588,8 @@ export default function RentalDashboardPage() {
                     </div>
 
                     {/* STATUS BADGE - MOBILE RIGHT POSITION */}
-                    <span
-                      className={`sm:hidden text-[10px] font-black px-2 py-0.5 rounded shrink-0 ${
-                        isOnJobsite
-                          ? "bg-red-50 text-red-700 border border-red-200"
-                          : "bg-yellow-100 text-yellow-950 border border-yellow-300"
-                      }`}
-                    >
-                      {isOnJobsite ? "On Jobsite" : "In Yard"}
+                    <span className="sm:hidden text-[10px] font-black px-2 py-0.5 rounded shrink-0 bg-yellow-100 text-yellow-950 border border-yellow-300">
+                      In Yard
                     </span>
                   </div>
 
@@ -581,22 +597,16 @@ export default function RentalDashboardPage() {
                     <span className="sm:hidden text-xs text-gray-500 font-semibold">Monthly Share:</span>
                     <div className="text-right">
                       <span className="font-black text-gray-950 block text-xs sm:text-base">
-                        ${rev.toLocaleString()}
+                        $0
                       </span>
                       <span className="text-[10px] sm:text-xs text-gray-400 font-medium">
-                        {pct}% of sales
+                        0% of sales
                       </span>
                     </div>
 
                     {/* STATUS BADGE - DESKTOP */}
-                    <span
-                      className={`hidden sm:inline-block text-xs font-bold px-2.5 py-1 rounded shrink-0 ${
-                        isOnJobsite
-                          ? "bg-red-50 text-red-700 border border-red-200"
-                          : "bg-yellow-50 text-yellow-800 border border-yellow-300"
-                      }`}
-                    >
-                      {isOnJobsite ? "On Jobsite" : "In Yard"}
+                    <span className="hidden sm:inline-block text-xs font-bold px-2.5 py-1 rounded shrink-0 bg-yellow-50 text-yellow-800 border border-yellow-300">
+                      In Yard
                     </span>
                   </div>
                 </div>
@@ -619,52 +629,49 @@ export default function RentalDashboardPage() {
                 </p>
               </div>
               <span className="bg-yellow-100 text-yellow-900 font-bold text-xs px-2.5 py-0.5 rounded">
-                2 Holds
+                {holds.length} {holds.length === 1 ? "Hold" : "Holds"}
               </span>
             </div>
 
-            {/* HOLD CARDS (RESPONSIVE NO-COLLISION LAYOUT) */}
-            <div className="space-y-2.5">
-              <div className="bg-gray-50 border border-gray-200 p-3 rounded-lg text-sm space-y-1.5 transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-yellow-400">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="font-black text-gray-950 text-xs sm:text-sm">
-                    CAT 259D3 Compact Track Loader
-                  </span>
-                  <span className="text-[11px] font-black text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded shrink-0">
-                    10h left
-                  </span>
-                </div>
-                <div className="text-xs text-gray-600">
-                  Client: <strong className="text-gray-950">Brandon Miller</strong> (Scottsdale, AZ)
-                </div>
-                <div className="flex items-center justify-between pt-1 border-t border-gray-200/60">
-                  <span className="font-black text-gray-950 text-xs sm:text-sm">$1,450 Quote</span>
-                  <span className="text-[10px] bg-red-100 text-red-800 font-black px-2 py-0.5 rounded">
-                    Pending Signature
-                  </span>
-                </div>
+            {/* HOLD CARDS (CLEAN EMPTY STATE OR ACTIVE HOLDS) */}
+            {holds.length === 0 ? (
+              <div className="py-8 px-4 text-center bg-gray-50 border border-dashed border-gray-200 rounded-lg">
+                <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-xs font-bold text-gray-700">No Active 48-Hour Holds</p>
+                <p className="text-[11px] text-gray-400 mt-1">
+                  Customer unit reservations will display here when generated.
+                </p>
               </div>
-
-              <div className="bg-gray-50 border border-gray-200 p-3 rounded-lg text-sm space-y-1.5 transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-yellow-400">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="font-black text-gray-950 text-xs sm:text-sm">
-                    2021 Cat 226D3 Skid Steer
-                  </span>
-                  <span className="text-[11px] font-black text-yellow-800 bg-yellow-100 border border-yellow-300 px-1.5 py-0.5 rounded shrink-0">
-                    18h left
-                  </span>
-                </div>
-                <div className="text-xs text-gray-600">
-                  Client: <strong className="text-gray-950">Dave Henderson</strong> (Anthem, AZ)
-                </div>
-                <div className="flex items-center justify-between pt-1 border-t border-gray-200/60">
-                  <span className="font-black text-gray-950 text-xs sm:text-sm">$975 Quote</span>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded">
-                    Signed & Sealed
-                  </span>
-                </div>
+            ) : (
+              <div className="space-y-2.5">
+                {holds.map((h) => (
+                  <div
+                    key={h.id}
+                    className="bg-gray-50 border border-gray-200 p-3 rounded-lg text-sm space-y-1.5 transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-yellow-400"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-black text-gray-950 text-xs sm:text-sm">
+                        {h.equipmentName}
+                      </span>
+                      <span className="text-[11px] font-black text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded shrink-0">
+                        {h.hoursRemaining}h left
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      Client: <strong className="text-gray-950">{h.customerName}</strong> ({h.jobsiteZip ? `ZIP ${h.jobsiteZip}` : "Phoenix, AZ"})
+                    </div>
+                    <div className="flex items-center justify-between pt-1 border-t border-gray-200/60">
+                      <span className="font-black text-gray-950 text-xs sm:text-sm">
+                        ${(h.totalAmount || 0).toLocaleString()} Quote
+                      </span>
+                      <span className="text-[10px] bg-yellow-100 text-yellow-900 font-black px-2 py-0.5 rounded">
+                        {h.signatureStatus === "signed" ? "Signed" : "Pending Signature"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
 
           <Link
