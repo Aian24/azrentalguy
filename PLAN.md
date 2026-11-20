@@ -52,8 +52,9 @@
                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                      DATA STORAGE LAYER                     │
-│  • Primary DB: SQLite (via Prisma / Drizzle) or PostgreSQL  │
-│  • Storage: Vercel Postgres / Supabase / Local SQLite       │
+│  • Primary DB: MariaDB / MySQL (Plesk localhost:3306) via   │
+│    Prisma ORM (Native on-server database; zero extra cost)  │
+│  • Dev DB: Local SQLite / MariaDB for offline development   │
 │  • PDF Receipts & Agreements: Frozen Snapshot JSON + PDF    │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -65,10 +66,10 @@
 * **Icons:** `lucide-react`
 * **Form & Validation:** `zod` + `react-hook-form`
 * **Signature Pad:** HTML5 Canvas (`react-signature-canvas` or vanilla lightweight HTML5 canvas implementation)
-* **Database & ORM:** Drizzle ORM or Prisma with SQLite (local development / single-file deploy) or PostgreSQL (Vercel Postgres / Supabase)
+* **Database & ORM:** Prisma ORM connected to native **MariaDB / MySQL on Plesk (`localhost:3306`)** with microsecond local socket performance
 * **AI Engine:** Vercel AI SDK (`ai` package) with Gemini 1.5 Flash / Claude 3.5 Sonnet support
 * **Staging Environment:** Vercel (`azrentalguy.vercel.app`)
-* **Production Environment:** Plesk Node.js Application Manager (Phusion Passenger or PM2 Reverse Proxy on `azrentalguy.com`)
+* **Production Environment:** **Plesk Node.js Manager** (Node 20.9.0 / 22.13.5 LTS with Phusion Passenger on `azrentalguy.com`)
 
 ---
 
@@ -270,7 +271,7 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
 ### Phase 6: Database & Backend Architecture (NEXT PHASE — Pending Client UI Approval)
 * **Goal:** Transition the platform from client-side mock/localStorage data into a persistent, production-grade backend engine before production cutover to Plesk.
 * **Key Tasks:**
-  1. **Database Schema & ORM Setup:** Configure Prisma or Drizzle ORM with PostgreSQL or SQLite. Create robust schemas for `Equipment`, `Bookings`, `Holds`, `Invoices`, `Leads`, `CountyPermits`, and `Settings`.
+  1. **Database Schema & ORM Setup:** Configure Prisma ORM with native **MariaDB / MySQL on Plesk (`localhost:3306`)**. Create robust relational schemas for `Equipment`, `Bookings`, `Holds`, `Invoices`, `Leads`, `CountyPermits`, and `Settings`.
   2. **Real Data Persistence & API Migration:** Replace `localStorage` operations with secure Next.js Server Actions and REST API routes (`/api/fleet`, `/api/bookings`, `/api/leads`, `/api/settings`).
   3. **Secure Admin Authentication:** Implement hashed credentials (bcrypt/argon2), JWT session tokens, role-based route protection, and CSRF security.
   4. **Automated Notification Services:** Connect Twilio SMS API for 48-hour reservation hold expiration warnings and SendGrid/Resend for automated PDF rental agreement receipts.
@@ -280,10 +281,11 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
 * **Vercel Staging:**
   * GitHub repository connected: `https://github.com/Aian24/azrentalguy`
   * Live staging preview: `https://azrentalguy.vercel.app/`
-* **Plesk Production Cutover:**
-  * Option A: Plesk Node.js Application Manager with Phusion Passenger (Node 20+).
-  * Option B: Next.js standalone build managed via PM2 behind Nginx reverse proxy.
-  * SSL Certificate verification and zero-downtime DNS transfer to `azrentalguy.com`.
+* **Plesk Production Cutover (Verified Setup on Server IP `85.215.33.152`):**
+  * **Step 1 (WordPress Backup):** Create a complete backup of legacy WordPress files (`httpdocs`) and MariaDB database (`wp_jzmwt`) using Plesk Backup & Restore.
+  * **Step 2 (Plesk Node.js Manager Activation):** Add `azrentalguy.com` to Plesk Node.js Manager, selecting Node `20.9.0` or `22.13.5` LTS in `production` mode with `npm`.
+  * **Step 3 (Database Connection):** Connect local MariaDB database via `DATABASE_URL="mysql://user:pass@localhost:3306/azrental_db"` in Plesk environment variables.
+  * **Step 4 (Build & Live Serving):** Pull latest code from GitHub, run `npm install` and `npm run build`. Plesk's Phusion Passenger automatically serves the Next.js app on `https://azrentalguy.com/` with existing SSL certificates.
 
 ---
 

@@ -1280,8 +1280,8 @@
       {
         id: "p6-1",
         phase: "phase6",
-        title: "Database Schema & Migration (PostgreSQL / SQLite via Prisma/Drizzle)",
-        desc: "Establish persistent relational database schemas for Equipment, Bookings, 48-Hour Holds, Invoices, Customers, Permit Leads, and System Settings.",
+        title: "Database Schema & Migration (Plesk MariaDB / MySQL via Prisma)",
+        desc: "Create dedicated production database on Plesk MariaDB (localhost:3306) with Prisma ORM schemas for Equipment, Bookings, 48-Hour Holds, Invoices, Customers, Permit Leads, and System Settings.",
         priority: "high",
         status: "pending"
       },
@@ -1338,16 +1338,16 @@
       {
         id: "p7-2",
         phase: "phase7",
-        title: "Plesk Node.js / Passenger Production Configuration",
-        desc: "Configure Plesk Obsidian Node.js application manager, environment secrets, and PM2/Passenger startup file.",
+        title: "Plesk Node.js Manager Production Setup (Node 20.9 / 22.13)",
+        desc: "Configure azrentalguy.com in Plesk Node.js Manager: select Node 20.9.0/22.13.5 LTS, production mode, connect local MariaDB (localhost:3306), and build via Phusion Passenger.",
         priority: "high",
         status: "pending"
       },
       {
         id: "p7-3",
         phase: "phase7",
-        title: "SSL Certificate & Domain Cutover to azrentalguy.com",
-        desc: "Verify DNS records, test HTTPS certificates, verify mobile responsiveness, and perform zero-downtime cutover.",
+        title: "WordPress Backup, SSL Verification & Cutover to azrentalguy.com",
+        desc: "Take full Plesk backup of legacy WordPress files and wp_jzmwt database, switch domain routing to Node.js Phusion Passenger, and verify zero-downtime cutover.",
         priority: "high",
         status: "pending"
       }
@@ -1365,7 +1365,7 @@
 
     // LOCAL STORAGE MANAGEMENT
     let tasks = [];
-    const STORAGE_KEY = "azrentalguy_tracker_tasks_v23";
+    const STORAGE_KEY = "azrentalguy_tracker_tasks_v24";
 
     function loadTasks() {
       const saved = localStorage.getItem(STORAGE_KEY);
