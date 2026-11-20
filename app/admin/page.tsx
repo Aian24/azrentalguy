@@ -185,12 +185,13 @@ export default function RentalDashboardPage() {
 
   const handleChartMouseLeave = () => {
     setIsHoveringChart(false);
-    setHoveredIndex(18); // Return smoothly to Peak Day
+    setHoveredIndex(3);
   };
 
-  const currentItem = lineData[hoveredIndex] || lineData[18];
-  const currentX = (hoveredIndex * (600 / (lineData.length - 1))).toFixed(1);
-  const currentY = currentItem.y;
+  const safeIndex = Math.max(0, Math.min(hoveredIndex, Math.max(0, lineData.length - 1)));
+  const currentItem = lineData[safeIndex] || lineData[0] || { day: "Today", rev: 0, bookings: 0, quotes: 0, y: 72 };
+  const currentX = (safeIndex * (600 / Math.max(1, lineData.length - 1))).toFixed(1);
+  const currentY = currentItem.y ?? 72;
 
   // Filtered & Paginated Scalable Data Table
   const filteredInvoices = transactions.filter((inv) => {
@@ -457,9 +458,9 @@ export default function RentalDashboardPage() {
                 ? `${currentItem.bookings} bookings`
                 : `${currentItem.quotes} quotes`}
             </span>
-            {currentItem.rev > 0 && hoveredIndex === 18 && (
+            {currentItem.rev > 0 && (
               <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.2 rounded font-black uppercase">
-                Peak
+                Active
               </span>
             )}
           </div>

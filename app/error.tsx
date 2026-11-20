@@ -12,48 +12,25 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
-    // Auto-reload once when a chunk hash mismatch occurs after a new server deployment
-    const isChunkError =
-      error?.name === "ChunkLoadError" ||
-      error?.message?.includes("Loading chunk") ||
-      error?.message?.includes("Failed to fetch");
-
-    if (isChunkError && typeof window !== "undefined") {
-      const lastReload = sessionStorage.getItem("az_chunk_reload_ts");
-      const now = Date.now();
-      if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
-        sessionStorage.setItem("az_chunk_reload_ts", String(now));
-        window.location.reload();
-      }
-    }
+    console.error("Application error:", error);
   }, [error]);
 
-  const handleHardReload = () => {
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem("az_chunk_reload_ts");
-      window.location.reload();
-    } else {
-      reset();
-    }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-white">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-white font-sans">
       <h2 className="text-3xl font-black text-gray-950 mb-3">
-        Updating Application
+        Something went wrong
       </h2>
       <p className="text-sm text-gray-600 mb-6 max-w-md font-medium">
-        A new version was deployed. Click below to load the latest updates.
+        An error occurred while loading this view. Click below to try again or return home.
       </p>
       <div className="flex gap-4">
         <button
           type="button"
-          onClick={handleHardReload}
+          onClick={() => reset()}
           className="btn-red px-6 py-3 rounded-lg text-xs font-black uppercase tracking-wider inline-flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
         >
-          <RefreshCw className="w-4 h-4 text-white animate-spin" />
-          <span>Reload Application</span>
+          <RefreshCw className="w-4 h-4 text-white" />
+          <span>Try Again</span>
         </button>
         <Link
           href="/"
