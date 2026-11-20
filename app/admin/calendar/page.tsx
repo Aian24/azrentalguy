@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -31,6 +31,47 @@ export default function FleetCalendarPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Sync calendar bookings from live MariaDB database & localStorage
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const res = await fetch("/api/bookings");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.bookings && Array.isArray(data.bookings) && data.bookings.length > 0) {
+            const mapped: CalendarBooking[] = data.bookings.map((b: any) => ({
+              id: b.id,
+              equipmentId: b.equipmentId,
+              customerName: b.customerName,
+              companyName: b.companyName,
+              startDate: b.startDate ? String(b.startDate).slice(0, 10) : "",
+              endDate: b.endDate ? String(b.endDate).slice(0, 10) : "",
+              status: (b.status === "active" || b.status === "reserved" || b.status === "hold" || b.status === "maintenance")
+                ? b.status
+                : "reserved",
+              notes: b.notes || b.jobsiteAddress || "",
+            }));
+            setBookings(mapped);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch bookings from server", err);
+      }
+
+      try {
+        const stored = localStorage.getItem("az_admin_calendar_bookings");
+        if (stored) {
+          setBookings(JSON.parse(stored));
+        }
+      } catch {}
+    };
+
+    fetchBookings();
+    window.addEventListener("admin_data_updated", fetchBookings);
+    return () => window.removeEventListener("admin_data_updated", fetchBookings);
+  }, []);
 
   const baseDate = new Date("2026-11-19T00:00:00");
   const days: { dateStr: string; dayNum: number; dayName: string; isWeekend: boolean }[] = [];
@@ -63,7 +104,7 @@ export default function FleetCalendarPage() {
     });
   });
 
-  const utilizationRate = Math.round((bookedDaysCount / totalDaysAcrossFleet) * 100) || 72;
+  const utilizationRate = Math.round((bookedDaysCount / totalDaysAcrossFleet) * 100);
 
   // Filtered Bookings for the Data Table
   const filteredBookings = bookings.filter((b) => {

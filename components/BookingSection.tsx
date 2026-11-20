@@ -154,6 +154,47 @@ export default function BookingSection() {
     setAgreementId(generatedId);
     setSubmitted(true);
 
+    // Sync to local state
+    try {
+      const storedHolds = localStorage.getItem("az_admin_holds");
+      const currentHolds = storedHolds ? JSON.parse(storedHolds) : [];
+      currentHolds.unshift({
+        id: "HLD-" + generatedId.slice(-4),
+        bookingId: generatedId,
+        equipmentId: machine.id,
+        equipmentName: machine.name,
+        customerName: name || "Customer",
+        phone: phone || "",
+        email: email || "",
+        startDate,
+        endDate,
+        durationDays: days,
+        totalAmount: quote.costs.totalDue,
+        expiresAt: new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
+        hoursRemaining: 48,
+        signatureStatus: "pending",
+        agreementId: generatedId,
+        jobsiteZip: "Phoenix, AZ",
+      });
+      localStorage.setItem("az_admin_holds", JSON.stringify(currentHolds));
+
+      const storedBookings = localStorage.getItem("az_admin_calendar_bookings");
+      const currentBookings = storedBookings ? JSON.parse(storedBookings) : [];
+      currentBookings.unshift({
+        id: generatedId,
+        equipmentId: machine.id,
+        customerName: name || "Customer",
+        startDate,
+        endDate,
+        status: "reserved",
+        notes: address || "Phoenix, AZ",
+      });
+      localStorage.setItem("az_admin_calendar_bookings", JSON.stringify(currentBookings));
+      window.dispatchEvent(new Event("admin_data_updated"));
+    } catch (e) {
+      console.error("Local sync error", e);
+    }
+
     // Sync to MariaDB and dispatch notification email to jbone@azrentalguy.com
     fetch("/api/bookings", {
       method: "POST",
@@ -171,7 +212,13 @@ export default function BookingSection() {
         totalAmount: quote.costs.totalDue,
         status: "reserved",
       }),
-    }).catch((err) => console.error("Hold sync error:", err));
+    })
+      .then(() => {
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("admin_data_updated"));
+        }
+      })
+      .catch((err) => console.error("Hold sync error:", err));
   };
 
   return (

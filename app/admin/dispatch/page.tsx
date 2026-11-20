@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Truck,
@@ -94,6 +94,55 @@ export default function AdminDispatchPage() {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isManifestModalOpen, setIsManifestModalOpen] = useState(false);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+
+  // Sync live dispatches and holds from MariaDB
+  useEffect(() => {
+    const fetchDispatchData = async () => {
+      try {
+        const [resHolds, resBookings] = await Promise.all([
+          fetch("/api/holds"),
+          fetch("/api/bookings"),
+        ]);
+
+        if (resHolds.ok) {
+          const dh = await resHolds.json();
+          if (dh.holds && Array.isArray(dh.holds) && dh.holds.length > 0) {
+            setHoldsList(dh.holds);
+          }
+        }
+
+        if (resBookings.ok) {
+          const db = await resBookings.json();
+          if (db.bookings && Array.isArray(db.bookings) && db.bookings.length > 0) {
+            const mapped: DispatchItem[] = db.bookings.map((b: any) => ({
+              id: b.id,
+              customerName: b.customerName,
+              companyName: b.companyName,
+              phone: b.phone || "",
+              email: b.email || "",
+              equipmentId: b.equipmentId,
+              equipmentName: b.equipmentName,
+              jobsiteAddress: b.jobsiteAddress || "Phoenix, AZ",
+              zipCode: "85001",
+              scheduledDate: b.startDate ? String(b.startDate).slice(0, 10) : "2026-11-20",
+              scheduledTime: "07:00 AM",
+              returnDate: b.endDate ? String(b.endDate).slice(0, 10) : "2026-11-21",
+              type: "delivery",
+              status: "scheduled",
+              driver: "J-Bone Fleet Transport",
+            }));
+            setDispatchList(mapped);
+          }
+        }
+      } catch (err) {
+        console.error("Live dispatch sync error", err);
+      }
+    };
+
+    fetchDispatchData();
+    window.addEventListener("admin_data_updated", fetchDispatchData);
+    return () => window.removeEventListener("admin_data_updated", fetchDispatchData);
+  }, []);
 
   const showNotice = (msg: string) => {
     setActionNotice(msg);

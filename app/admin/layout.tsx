@@ -79,9 +79,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [holdsList, setHoldsList] = useState<ActiveHold[]>(INITIAL_HOLDS);
   const holdsRef = React.useRef<HTMLDivElement>(null);
 
-  // AUTO-PURGE DEMO DATA AND SYNC LIVE COUNTS
+  // AUTO-PURGE DEMO DATA AND SYNC LIVE COUNTS (LOCALSTORAGE + MARIADB)
   useEffect(() => {
-    const syncDataCounts = () => {
+    const syncDataCounts = async () => {
       try {
         const storedHolds = localStorage.getItem("az_admin_holds");
         const storedLeads = localStorage.getItem("az_admin_leads");
@@ -102,37 +102,45 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           setDispatchCount(0);
           setPipelineCount(0);
           setPermitCount(0);
-          return;
-        }
-
-        if (storedHolds) {
-          setHoldsList(JSON.parse(storedHolds));
         } else {
-          setHoldsList([]);
-        }
-
-        if (storedDispatch) {
-          setDispatchCount(JSON.parse(storedDispatch).length);
-        } else {
-          setDispatchCount(0);
-        }
-
-        if (storedLeads) {
-          setPipelineCount(JSON.parse(storedLeads).length);
-        } else {
-          setPipelineCount(0);
-        }
-
-        if (storedPermits) {
-          setPermitCount(JSON.parse(storedPermits).length);
-        } else {
-          setPermitCount(0);
+          if (storedHolds) {
+            setHoldsList(JSON.parse(storedHolds));
+          } else {
+            setHoldsList([]);
+          }
+          if (storedDispatch) setDispatchCount(JSON.parse(storedDispatch).length);
+          if (storedLeads) setPipelineCount(JSON.parse(storedLeads).length);
+          if (storedPermits) setPermitCount(JSON.parse(storedPermits).length);
         }
       } catch {
         setHoldsList([]);
         setDispatchCount(0);
         setPipelineCount(0);
         setPermitCount(0);
+      }
+
+      // Sync with live MariaDB server database
+      try {
+        const [resHolds, resBookings] = await Promise.all([
+          fetch("/api/holds"),
+          fetch("/api/bookings"),
+        ]);
+
+        if (resHolds.ok) {
+          const dataH = await resHolds.json();
+          if (dataH.holds && Array.isArray(dataH.holds)) {
+            setHoldsList(dataH.holds);
+          }
+        }
+
+        if (resBookings.ok) {
+          const dataB = await resBookings.json();
+          if (dataB.bookings && Array.isArray(dataB.bookings)) {
+            setDispatchCount(dataB.bookings.length);
+          }
+        }
+      } catch (err) {
+        console.error("Live DB count sync error", err);
       }
     };
 

@@ -48,38 +48,83 @@ export default function RentalDashboardPage() {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
-  // Auto-purge demo development data on initial load
+  // Auto-purge demo development data on initial load and sync with live MariaDB
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("az_admin_invoices");
-      const storedHolds = localStorage.getItem("az_admin_holds");
-      let shouldPurge = false;
+    const syncDashboardData = async () => {
+      try {
+        const stored = localStorage.getItem("az_admin_invoices");
+        const storedHolds = localStorage.getItem("az_admin_holds");
+        let shouldPurge = false;
 
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (isDemoData(parsed)) shouldPurge = true;
-        else setTransactions(parsed);
-      } else {
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (isDemoData(parsed)) shouldPurge = true;
+          else setTransactions(parsed);
+        } else {
+          setTransactions([]);
+        }
+
+        if (storedHolds) {
+          const parsed = JSON.parse(storedHolds);
+          if (isDemoData(parsed)) shouldPurge = true;
+          else setHolds(parsed);
+        } else {
+          setHolds([]);
+        }
+
+        if (shouldPurge) {
+          purgeDemoStorage();
+          setTransactions([]);
+          setHolds([]);
+        }
+      } catch {
         setTransactions([]);
-      }
-
-      if (storedHolds) {
-        const parsed = JSON.parse(storedHolds);
-        if (isDemoData(parsed)) shouldPurge = true;
-        else setHolds(parsed);
-      } else {
         setHolds([]);
       }
 
-      if (shouldPurge) {
-        purgeDemoStorage();
-        setTransactions([]);
-        setHolds([]);
+      // Sync with live MariaDB server database
+      try {
+        const [resB, resH] = await Promise.all([
+          fetch("/api/bookings"),
+          fetch("/api/holds"),
+        ]);
+
+        if (resH.ok) {
+          const dh = await resH.json();
+          if (dh.holds && Array.isArray(dh.holds)) {
+            setHolds(dh.holds);
+          }
+        }
+
+        if (resB.ok) {
+          const db = await resB.json();
+          if (db.bookings && Array.isArray(db.bookings)) {
+            const mappedTxns: SalesTransaction[] = db.bookings.map((b: any) => ({
+              id: b.id,
+              customerName: b.customerName,
+              companyName: b.companyName || "",
+              equipmentName: b.equipmentName,
+              amount: Number(b.totalAmount || b.quotedAmount || 0),
+              date: b.created_at ? new Date(b.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Today",
+              paymentMethod: "Credit Card (Pending)",
+              status: b.signatureData ? "Paid" : "Deposit Held",
+              jobsite: b.jobsiteAddress || "Phoenix, AZ",
+            }));
+            setTransactions(mappedTxns);
+          }
+        }
+      } catch (err) {
+        console.error("Live DB dashboard sync error", err);
       }
-    } catch {
-      setTransactions([]);
-      setHolds([]);
-    }
+    };
+
+    syncDashboardData();
+    window.addEventListener("admin_data_updated", syncDashboardData);
+    window.addEventListener("az_admin_purged", syncDashboardData);
+    return () => {
+      window.removeEventListener("admin_data_updated", syncDashboardData);
+      window.removeEventListener("az_admin_purged", syncDashboardData);
+    };
   }, []);
 
   const svgRef = useRef<SVGSVGElement | null>(null);
