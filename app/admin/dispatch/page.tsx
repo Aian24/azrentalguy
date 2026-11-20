@@ -130,6 +130,7 @@ export default function AdminDispatchPage() {
               type: "delivery",
               status: "scheduled",
               driver: "J-Bone Fleet Transport",
+              amount: Number(b.totalAmount || b.quotedAmount || b.amount || 0),
             }));
             setDispatchList(mapped);
           }
@@ -618,7 +619,7 @@ export default function AdminDispatchPage() {
                     {item.driver}
                   </td>
                   <td className="py-3.5 px-4 text-right font-black text-gray-950 text-base">
-                    ${item.amount.toLocaleString()}
+                    ${(item.amount || 0).toLocaleString()}
                   </td>
                   {/* COLOR-CODED STATUS SELECT (MATCHING PIPELINE / PERMITS) */}
                   <td className="py-3.5 px-4 whitespace-nowrap">
@@ -696,7 +697,7 @@ export default function AdminDispatchPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <div className="font-black text-gray-950 text-base leading-none">
-                    ${item.amount.toLocaleString()}
+                    ${(item.amount || 0).toLocaleString()}
                   </div>
                   <div className="mt-1">
                     <select
@@ -882,7 +883,7 @@ export default function AdminDispatchPage() {
                         {h.startDate} → {h.endDate}
                       </td>
                       <td className="py-3 px-4 text-right font-black text-gray-950 text-sm">
-                        ${h.totalAmount.toLocaleString()}
+                        ${(h.totalAmount || 0).toLocaleString()}
                       </td>
                       <td className="py-3 px-4 font-bold text-red-600 text-xs whitespace-nowrap">
                         {h.hoursRemaining}h left
@@ -946,7 +947,7 @@ export default function AdminDispatchPage() {
                     </div>
                     <div className="text-right shrink-0">
                       <div className="font-black text-gray-950 text-sm">
-                        ${h.totalAmount.toLocaleString()}
+                        ${(h.totalAmount || 0).toLocaleString()}
                       </div>
                       <span
                         className={`inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded border ${h.signatureStatus === "signed"

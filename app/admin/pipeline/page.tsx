@@ -424,7 +424,7 @@ export default function LeadPipelinePage() {
                       {/* AMOUNT */}
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <div className="font-black text-gray-950 text-base">
-                          ${lead.quotedAmount.toLocaleString()}
+                          ${(lead.quotedAmount || 0).toLocaleString()}
                         </div>
                       </td>
 
@@ -524,7 +524,7 @@ export default function LeadPipelinePage() {
                     </div>
                     <div className="text-right shrink-0">
                       <div className="font-black text-gray-950 text-base leading-none">
-                        ${lead.quotedAmount.toLocaleString()}
+                        ${(lead.quotedAmount || 0).toLocaleString()}
                       </div>
                       <div className="mt-1">
                         <select
@@ -711,7 +711,7 @@ export default function LeadPipelinePage() {
 
                         <div className="flex items-center justify-between pt-1">
                           <strong className="text-sm font-black text-gray-950">
-                            ${lead.quotedAmount.toLocaleString()}
+                            ${(lead.quotedAmount || 0).toLocaleString()}
                           </strong>
                           <a
                             href={`tel:${lead.phone}`}

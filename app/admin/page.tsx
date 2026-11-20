@@ -845,7 +845,7 @@ export default function RentalDashboardPage() {
                     {inv.paymentMethod}
                   </td>
                   <td className="py-3.5 px-4 text-right font-black text-gray-950 text-base">
-                    ${inv.amount.toLocaleString()}
+                    ${(inv.amount || 0).toLocaleString()}
                   </td>
                   <td className="py-3.5 px-4 whitespace-nowrap">
                     <span
@@ -889,7 +889,7 @@ export default function RentalDashboardPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <div className="font-black text-gray-950 text-base leading-none">
-                    ${inv.amount.toLocaleString()}
+                    ${(inv.amount || 0).toLocaleString()}
                   </div>
                   <span
                     className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
