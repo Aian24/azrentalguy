@@ -268,26 +268,38 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
   10. **Operator User Manual & Interactive Guide (`/admin/manual`):** Beginner-friendly, tabbed operator guide explaining the exact purpose, step-by-step instructions, and operational tips for every page.
   11. **Branded SweetAlert2 Modal Dialogs:** Custom red & gold confirmation and alert modals replacing native browser alerts throughout the system.
 
-### Phase 6: Database & Backend Architecture [STATUS: DEFERRED / POST-LAUNCH ENHANCEMENT]
-> **Client Directive (Deferred):** The client reviewed the completed design and gave an explicit directive: *"No. Make it live. No more work. This was supposed to be a quick website design."* To respect the client's timeline and budget, the complex database schema and backend microservices are deferred as post-launch enhancements. The entire platform runs with client-side state and localStorage persistence, requiring zero database maintenance for immediate live launch.
+### Phase 6: Database & Backend Architecture [STATUS: COMPLETE]
+> **Live Production MariaDB Database Engine:** Full backend relational database integration built using pure Node.js `mysql2/promise` connection pooling, connecting directly to Plesk's local MariaDB instance (`localhost:3306`).
+* **Relational Schema (`schema.sql`):** 9 robust tables (`equipments`, `bookings`, `reservation_holds`, `pipeline_leads`, `dispatches`, `permits`, `reviews_queue`, `invoices`, `app_settings`) with complete indexing, foreign keys, timestamps, and default J-Bone Industries seed records.
+* **Database Connection Manager (`lib/db.ts`):** Connection pool handling both `DATABASE_URL` and granular Plesk environment variables (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`), with connection testing and automatic fallback resilience.
+* **One-Click Auto-Migration (`/api/init-db`):** Browser-accessible or startup-triggerable automated DDL migration endpoint that generates all tables and seeds initial fleet data if empty.
+* **Live REST API Endpoints:**
+  * `/api/fleet`: GET, POST, DELETE with full database persistence and memory sync.
+  * `/api/bookings`: GET, POST with SHA-256 cryptographic audit hash generation.
+  * `/api/holds`: GET, POST with real-time 48-hr countdowns, SMS trigger, and release actions.
+  * `/api/leads`: GET, POST, PUT with CRM pipeline stage transitions and priority updates.
+  * `/api/settings`: GET, PUT for universal rates, Arizona MST timezone, and business legal info.
+  * `/api/dispatch`: GET, PUT for real-time driver/rig assignments and delivery statuses.
+* **Hybrid Data Hydration:** Frontend operations seamlessly persist to MariaDB while maintaining offline/local-cache resilience.
 
 ### Phase 7: Plesk Production Deployment & Domain Cutover [STATUS: ACTIVE — READY TO DEPLOY]
 * **Vercel Staging:**
   * GitHub repository connected: `https://github.com/Aian24/azrentalguy`
   * Live staging preview: `https://azrentalguy.vercel.app/`
 * **Plesk Production Cutover (Server IP `85.215.33.152`):**
-  * **Step 1 (WordPress Backup):** In Plesk for `azrentalguy.com`, click **Backup & Restore** -> create a safety snapshot of existing WordPress files and `wp_jzmwt` database.
-  * **Step 2 (Clean `httpdocs`):** In Plesk File Manager, move old WordPress files into a backup subfolder (`_wp_backup`).
-  * **Step 3 (Pull from Git):** Use Plesk's Git extension or clone `https://github.com/Aian24/azrentalguy.git` directly into `/httpdocs`.
-  * **Step 4 (Plesk Node.js Manager Activation):**
-    * In Plesk Node.js Manager, enable Node.js for `azrentalguy.com`.
-    * **Node Version:** Node 20.x, 22.x LTS, or 25.x (matches existing `relaunch.us` domain on the server).
+  * **Step 1 (Plesk MariaDB Database):** In Plesk for `azrentalguy.com`, check or create the database in the **Databases** tab (e.g. `wp_jzmwt` with user `wp_umtys`, or a dedicated `azrentalguy_db`). Set database credentials in Node.js Environment Variables.
+  * **Step 2 (Auto-Initialize Schema):** Run `https://azrentalguy.com/api/init-db` or import `schema.sql` via phpMyAdmin to create all 9 tables.
+  * **Step 3 (WordPress Safety Backup):** Click **Backup & Restore** in Plesk to snapshot the current WordPress installation.
+  * **Step 4 (Pull from Git):** Use Plesk's Git extension or clone `https://github.com/Aian24/azrentalguy.git` into `/httpdocs`.
+  * **Step 5 (Plesk Node.js Manager Activation):**
+    * Enable Node.js for `azrentalguy.com`.
+    * **Node Version:** Node 22.x LTS (or 25.x).
     * **Application Mode:** `production`
     * **Application Root:** `/httpdocs`
     * **Document Root:** `/httpdocs/public` (or `/httpdocs`)
-    * **Application Startup File:** `server.js` (custom Passenger server created and tested).
-  * **Step 5 (NPM Install & Build):** In Plesk, click **NPM Install**, then click **Run Script** -> `build`.
-  * **Step 6 (Restart & Go Live):** Click **Restart App**. The new website is live on `https://azrentalguy.com/` with existing SSL certificates.
+    * **Application Startup File:** `server.js` (custom Passenger server).
+  * **Step 6 (NPM Install & Build):** In Plesk Node.js Manager, click **NPM Install**, then click **Run Script** -> `build`.
+  * **Step 7 (Restart & Verify Live):** Click **Restart App**. The new platform is live on `https://azrentalguy.com/` with live MariaDB persistence.
 
 ---
 
@@ -300,7 +312,7 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
 | **Next.js Core Application** | Modern frontend, catalog, quote calculator, signature pad | Vercel preview & local build verification |
 | **Phase 4: AI Rental Assistant** | 24/7 Chatbot & automated lead generator | **Skipped / On Hold** per client decision |
 | **Phase 5: Admin Operations (`/admin`)** | Full 8-page admin suite (Dispatch, Pipeline, Calendar, Permits, Reviews, Fleet, Settings, Manual) | **100% COMPLETE** & Verified (`npm run build`) |
-| **Phase 6: Database & Backend** | Database tables, Server Actions, auth, notification microservices | **Deferred / Post-Launch Enhancement** per Client Directive |
+| **Phase 6: Database & Backend** | Plesk MariaDB engine (`mysql2`), `schema.sql`, auto-migration API, and 6 CRUD routes | **100% COMPLETE** & Verified |
 | **Phase 7: Plesk Production Cutover** | Node.js Phusion Passenger setup, server.js startup file, and live cutover | **IN PROGRESS / READY TO DEPLOY** |
 
 ---

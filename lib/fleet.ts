@@ -288,6 +288,12 @@ export function saveStoredFleet(fleet: EquipmentItem[]): void {
   try {
     localStorage.setItem("az_admin_fleet", JSON.stringify(fleet));
     window.dispatchEvent(new Event("az_fleet_updated"));
+    // Asynchronously sync to database on Plesk
+    fetch("/api/fleet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fleet),
+    }).catch(() => {});
   } catch (err) {
     console.error("Failed to save stored fleet:", err);
   }

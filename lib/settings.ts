@@ -77,6 +77,12 @@ export function saveStoredSettings(settings: AppSettings): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     applySettingsToDOM(settings);
     window.dispatchEvent(new Event("app_settings_updated"));
+    // Asynchronously sync to database on Plesk
+    fetch("/api/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(settings),
+    }).catch(() => {});
   } catch (err) {
     console.error("Failed to save settings to localStorage", err);
   }

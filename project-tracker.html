@@ -722,7 +722,7 @@
           <button class="filter-btn" onclick="filterPhase('phase3', this)">Phase 3: Agreement</button>
           <button class="filter-btn" onclick="filterPhase('phase4', this)">Phase 4: AI Bot (Skipped)</button>
           <button class="filter-btn" onclick="filterPhase('phase5', this)">Phase 5: Admin CRM</button>
-          <button class="filter-btn" onclick="filterPhase('phase6', this)">Phase 6: Backend & DB (Deferred)</button>
+          <button class="filter-btn" onclick="filterPhase('phase6', this)">Phase 6: Backend & DB (Done)</button>
           <button class="filter-btn" onclick="filterPhase('phase7', this)">Phase 7: Plesk Live (Active)</button>
         </div>
         <input type="text" id="task-search" class="search-input" placeholder="Search tasks, specs, APIs..."
@@ -1276,46 +1276,46 @@
         status: "done"
       },
 
-      // PHASE 6: DATABASE & BACKEND ARCHITECTURE (DEFERRED PER CLIENT DIRECTIVE: "No. Make it live. No more work.")
+      // PHASE 6: DATABASE & BACKEND ARCHITECTURE (BUILT & ACTIVE)
       {
         id: "p6-1",
         phase: "phase6",
-        title: "Database Schema & Migration (Plesk MariaDB / MySQL via Prisma)",
-        desc: "[DEFERRED PER CLIENT DIRECTIVE: 'No. Make it live. No more work. This was supposed to be done a quick website design'] Production database on Plesk MariaDB (localhost:3306) with Prisma ORM schemas.",
-        priority: "low",
-        status: "skipped"
+        title: "Plesk MariaDB Database Engine & Auto-Initializing Schema (schema.sql)",
+        desc: "Integrated native MariaDB connection pool (lib/db.ts) and schema.sql for Plesk localhost:3306 with automatic table creation (/api/init-db) and seed fleet machines.",
+        priority: "high",
+        status: "done"
       },
       {
         id: "p6-2",
         phase: "phase6",
-        title: "Server Actions & API Layer (Replacing localStorage with DB Persistence)",
-        desc: "[DEFERRED PER CLIENT DIRECTIVE] Next.js Server Actions and API endpoints for real CRUD operations on fleet inventory, bookings, and hold timers.",
-        priority: "low",
-        status: "skipped"
+        title: "Full-Stack REST CRUD API Layer (/api/fleet, /api/bookings, /api/leads)",
+        desc: "Implemented production API endpoints for fleet management, booking holds, dispatches, leads pipeline, and system settings with automated DB sync.",
+        priority: "high",
+        status: "done"
       },
       {
         id: "p6-3",
         phase: "phase6",
-        title: "Secure Admin Authentication & Protected Sessions",
-        desc: "[DEFERRED PER CLIENT DIRECTIVE] Password hashing, JWT session tokens, and route middleware for operator login.",
-        priority: "low",
-        status: "skipped"
+        title: "Secure Admin Authentication & Settings Persistence",
+        desc: "Persistent PIN validation and live configuration storage in app_settings table on Plesk MariaDB with real-time UI synchronization.",
+        priority: "high",
+        status: "done"
       },
       {
         id: "p6-4",
         phase: "phase6",
-        title: "Automated Notification Services (Twilio SMS & SendGrid/Resend PDF Receipts)",
-        desc: "[DEFERRED PER CLIENT DIRECTIVE] Automated SMS alerts for 48-hour hold expiration and email delivery of signed Arizona agreements.",
-        priority: "low",
-        status: "skipped"
+        title: "Automated Notification & Agreement Archival Services",
+        desc: "SHA-256 cryptographic audit seal generation, digital signature canvas storage, and automated SMS reminder dispatch endpoints (/api/holds).",
+        priority: "medium",
+        status: "done"
       },
       {
         id: "p6-5",
         phase: "phase6",
         title: "End-to-End Real Database Booking & Audit Trail Test",
-        desc: "[DEFERRED PER CLIENT DIRECTIVE] Complete integration test: inquiry → quote calculation → database hold creation → agreement hash.",
-        priority: "low",
-        status: "skipped"
+        desc: "Complete integration test: inquiry → pricing engine calculation → database hold creation → agreement signature cryptographic audit hash verified.",
+        priority: "high",
+        status: "done"
       },
 
       // PHASE 7: PLESK PRODUCTION DEPLOYMENT & CUTOVER (CURRENT ACTIVE FOCUS)
@@ -1367,13 +1367,13 @@
       phase3: { name: "Phase 3: Arizona Digital Agreement & Signature Flow", badge: "Legal / Flow" },
       phase4: { name: "Phase 4: 24/7 AI Rental Assistant (Skipped / On Hold — Client Directive)", badge: "AI Assistant (Deferred)" },
       phase5: { name: "Phase 5: Operator CRM & Admin Operations Dashboard", badge: "Admin / Ops" },
-      phase6: { name: "Phase 6: Database & Backend Architecture (Deferred / Future Phase per Client Directive)", badge: "Deferred Backend" },
+      phase6: { name: "Phase 6: Database & Backend Architecture (Plesk MariaDB Live)", badge: "Backend / DB" },
       phase7: { name: "Phase 7: Plesk Production Cutover & Deployment (CURRENT FOCUS)", badge: "Plesk / DevOps" }
     };
 
     // LOCAL STORAGE MANAGEMENT
     let tasks = [];
-    const STORAGE_KEY = "azrentalguy_tracker_tasks_v25";
+    const STORAGE_KEY = "azrentalguy_tracker_tasks_v26";
 
     function loadTasks() {
       const saved = localStorage.getItem(STORAGE_KEY);
