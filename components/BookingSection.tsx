@@ -153,6 +153,25 @@ export default function BookingSection() {
     const generatedId = "AZR-" + Math.floor(100000 + Math.random() * 900000);
     setAgreementId(generatedId);
     setSubmitted(true);
+
+    // Sync to MariaDB and dispatch notification email to jbone@azrentalguy.com
+    fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: generatedId,
+        equipmentId: machine.id,
+        equipmentName: machine.name,
+        customerName: name,
+        phone,
+        email: email || "customer@example.com",
+        jobsiteAddress: address,
+        startDate,
+        endDate,
+        totalAmount: quote.costs.totalDue,
+        status: "reserved",
+      }),
+    }).catch((err) => console.error("Hold sync error:", err));
   };
 
   return (

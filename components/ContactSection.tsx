@@ -7,6 +7,10 @@ import ScrollReveal from "@/components/ScrollReveal";
 
 export default function ContactSection() {
   const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState("");
+  const [loadedAt] = useState(() => Date.now());
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -14,9 +18,35 @@ export default function ContactSection() {
     message: "",
   });
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          honeypot,
+          clientLoadedAt: loadedAt,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setErrorMessage(data.error || "Submission could not be completed.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      setSent(true);
+    } catch (err: any) {
+      setErrorMessage("Network error sending inquiry. Please call our dispatch line directly.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -131,6 +161,26 @@ export default function ContactSection() {
               </div>
             ) : (
               <form onSubmit={handleContactSubmit} className="space-y-4">
+                {errorMessage && (
+                  <div className="p-3 bg-red-100 border border-red-300 rounded-xl text-red-900 text-xs font-bold">
+                    {errorMessage}
+                  </div>
+                )}
+
+                {/* ANTI-SPAM HONEYPOT FIELD (Hidden from humans, filled by bots) */}
+                <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+                  <label htmlFor="hp_company_website">Company Website (Leave Blank)</label>
+                  <input
+                    id="hp_company_website"
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-black uppercase tracking-wider text-gray-800 mb-2">
@@ -191,10 +241,11 @@ export default function ContactSection() {
                 <div className="flex flex-col sm:flex-row gap-3.5 pt-2">
                   <button
                     type="submit"
-                    className="btn-red flex-1 py-4 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:scale-101 transition-all"
+                    disabled={isSubmitting}
+                    className="btn-red flex-1 py-4 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:scale-101 transition-all disabled:opacity-50"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Send Inquiry</span>
+                    <span>{isSubmitting ? "Sending..." : "Send Inquiry"}</span>
                   </button>
                   <a
                     href={`tel:${COMPANY_INFO.phoneRaw}`}
@@ -204,6 +255,10 @@ export default function ContactSection() {
                     <span>Call Dispatch</span>
                   </a>
                 </div>
+
+                <p className="text-[11px] text-gray-500 text-center font-medium mt-2">
+                  Protected by Anti-Spam Bot Filter • Dispatches directly to <strong className="text-gray-700">jbone@azrentalguy.com</strong>
+                </p>
               </form>
             )}
           </ScrollReveal>

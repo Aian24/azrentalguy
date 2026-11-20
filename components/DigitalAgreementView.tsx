@@ -257,6 +257,28 @@ export default function DigitalAgreementView({ agreementId }: DigitalAgreementVi
     setIsSigned(true);
     setIsSubmitting(false);
 
+    // Save signed agreement to MariaDB and dispatch confirmation email to jbone@azrentalguy.com
+    fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: agreementId,
+        equipmentId: machine.id,
+        equipmentName: machine.name,
+        customerName: fullName,
+        companyName: companyName || "",
+        phone,
+        email,
+        jobsiteAddress: jobsiteAddress,
+        startDate,
+        endDate,
+        totalAmount: quote.costs.totalDue,
+        signatureData: signatureDataUrl,
+        auditHash: hash,
+        status: "signed",
+      }),
+    }).catch((err) => console.error("Signed agreement sync error:", err));
+
     // Scroll to confirmation
     window.scrollTo({ top: 0, behavior: "smooth" });
 

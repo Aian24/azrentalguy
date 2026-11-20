@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { queryDb, executeDb, getDbPool } from "@/lib/db";
+import { sendExecutiveNotification } from "@/lib/email";
 import crypto from "crypto";
 
 export async function GET() {
@@ -91,6 +92,46 @@ export async function POST(req: Request) {
       );
     }
 
+    // Send executive email notification to jbone@azrentalguy.com
+    try {
+      if (signatureData) {
+        await sendExecutiveNotification({
+          subject: `Signed Rental Agreement #${bookingId} [${equipmentName}]`,
+          type: "signed_agreement",
+          customerName,
+          customerPhone: phone,
+          customerEmail: email,
+          detailsHtml: `
+            <div style="background: #F1F5F9; border-radius: 8px; padding: 16px;">
+              <p style="margin: 6px 0;"><strong>Equipment:</strong> ${equipmentName}</p>
+              <p style="margin: 6px 0;"><strong>Rental Period:</strong> ${startDate} to ${endDate}</p>
+              <p style="margin: 6px 0;"><strong>Jobsite:</strong> ${jobsiteAddress}</p>
+              <p style="margin: 6px 0;"><strong>Total Locked:</strong> $${totalAmount.toLocaleString()}</p>
+              <p style="margin: 6px 0;"><strong>SHA-256 Audit Seal:</strong> <code style="font-size: 11px; word-break: break-all; color: #CA021E;">${auditHash}</code></p>
+            </div>
+          `,
+        });
+      } else {
+        await sendExecutiveNotification({
+          subject: `New Equipment Quote & Hold #${bookingId} [${equipmentName}]`,
+          type: "quote",
+          customerName,
+          customerPhone: phone,
+          customerEmail: email,
+          detailsHtml: `
+            <div style="background: #F1F5F9; border-radius: 8px; padding: 16px;">
+              <p style="margin: 6px 0;"><strong>Equipment:</strong> ${equipmentName}</p>
+              <p style="margin: 6px 0;"><strong>Rental Period:</strong> ${startDate} to ${endDate}</p>
+              <p style="margin: 6px 0;"><strong>Jobsite:</strong> ${jobsiteAddress}</p>
+              <p style="margin: 6px 0;"><strong>Quoted Total:</strong> $${totalAmount.toLocaleString()}</p>
+            </div>
+          `,
+        });
+      }
+    } catch (emailErr) {
+      console.error("Executive notification dispatch error:", emailErr);
+    }
+
     return NextResponse.json({
       success: true,
       booking: {
@@ -107,4 +148,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
-
