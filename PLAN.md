@@ -268,24 +268,26 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
   10. **Operator User Manual & Interactive Guide (`/admin/manual`):** Beginner-friendly, tabbed operator guide explaining the exact purpose, step-by-step instructions, and operational tips for every page.
   11. **Branded SweetAlert2 Modal Dialogs:** Custom red & gold confirmation and alert modals replacing native browser alerts throughout the system.
 
-### Phase 6: Database & Backend Architecture (NEXT PHASE — Pending Client UI Approval)
-* **Goal:** Transition the platform from client-side mock/localStorage data into a persistent, production-grade backend engine before production cutover to Plesk.
-* **Key Tasks:**
-  1. **Database Schema & ORM Setup:** Configure Prisma ORM with native **MariaDB / MySQL on Plesk (`localhost:3306`)**. Create robust relational schemas for `Equipment`, `Bookings`, `Holds`, `Invoices`, `Leads`, `CountyPermits`, and `Settings`.
-  2. **Real Data Persistence & API Migration:** Replace `localStorage` operations with secure Next.js Server Actions and REST API routes (`/api/fleet`, `/api/bookings`, `/api/leads`, `/api/settings`).
-  3. **Secure Admin Authentication:** Implement hashed credentials (bcrypt/argon2), JWT session tokens, role-based route protection, and CSRF security.
-  4. **Automated Notification Services:** Connect Twilio SMS API for 48-hour reservation hold expiration warnings and SendGrid/Resend for automated PDF rental agreement receipts.
-  5. **County Permit Scraper API:** Automated sync for Maricopa County excavation permits.
+### Phase 6: Database & Backend Architecture [STATUS: DEFERRED / POST-LAUNCH ENHANCEMENT]
+> **Client Directive (Deferred):** The client reviewed the completed design and gave an explicit directive: *"No. Make it live. No more work. This was supposed to be a quick website design."* To respect the client's timeline and budget, the complex database schema and backend microservices are deferred as post-launch enhancements. The entire platform runs with client-side state and localStorage persistence, requiring zero database maintenance for immediate live launch.
 
-### Phase 7: Plesk Production Deployment & Domain Cutover
+### Phase 7: Plesk Production Deployment & Domain Cutover [STATUS: ACTIVE — READY TO DEPLOY]
 * **Vercel Staging:**
   * GitHub repository connected: `https://github.com/Aian24/azrentalguy`
   * Live staging preview: `https://azrentalguy.vercel.app/`
-* **Plesk Production Cutover (Verified Setup on Server IP `85.215.33.152`):**
-  * **Step 1 (WordPress Backup):** Create a complete backup of legacy WordPress files (`httpdocs`) and MariaDB database (`wp_jzmwt`) using Plesk Backup & Restore.
-  * **Step 2 (Plesk Node.js Manager Activation):** Add `azrentalguy.com` to Plesk Node.js Manager, selecting Node `20.9.0` or `22.13.5` LTS in `production` mode with `npm`.
-  * **Step 3 (Database Connection):** Connect local MariaDB database via `DATABASE_URL="mysql://user:pass@localhost:3306/azrental_db"` in Plesk environment variables.
-  * **Step 4 (Build & Live Serving):** Pull latest code from GitHub, run `npm install` and `npm run build`. Plesk's Phusion Passenger automatically serves the Next.js app on `https://azrentalguy.com/` with existing SSL certificates.
+* **Plesk Production Cutover (Server IP `85.215.33.152`):**
+  * **Step 1 (WordPress Backup):** In Plesk for `azrentalguy.com`, click **Backup & Restore** -> create a safety snapshot of existing WordPress files and `wp_jzmwt` database.
+  * **Step 2 (Clean `httpdocs`):** In Plesk File Manager, move old WordPress files into a backup subfolder (`_wp_backup`).
+  * **Step 3 (Pull from Git):** Use Plesk's Git extension or clone `https://github.com/Aian24/azrentalguy.git` directly into `/httpdocs`.
+  * **Step 4 (Plesk Node.js Manager Activation):**
+    * In Plesk Node.js Manager, enable Node.js for `azrentalguy.com`.
+    * **Node Version:** Node 20.x, 22.x LTS, or 25.x (matches existing `relaunch.us` domain on the server).
+    * **Application Mode:** `production`
+    * **Application Root:** `/httpdocs`
+    * **Document Root:** `/httpdocs/public` (or `/httpdocs`)
+    * **Application Startup File:** `server.js` (custom Passenger server created and tested).
+  * **Step 5 (NPM Install & Build):** In Plesk, click **NPM Install**, then click **Run Script** -> `build`.
+  * **Step 6 (Restart & Go Live):** Click **Restart App**. The new website is live on `https://azrentalguy.com/` with existing SSL certificates.
 
 ---
 
@@ -296,10 +298,10 @@ PHASE 6: Staging Deployment (Vercel) & Plesk Transfer Plan
 | **`PLAN.md`** | Master architectural roadmap & requirements specification | Verified in workspace |
 | **`project-tracker.html`** | Interactive solid-color monitoring dashboard with local storage persistence | Open in browser, verify task toggles & metrics |
 | **Next.js Core Application** | Modern frontend, catalog, quote calculator, signature pad | Vercel preview & local build verification |
-| **Phase 4: AI Rental Assistant** | 24/7 Chatbot & automated lead generator | **Skipped / On Hold** per client decision (preserved in plan) |
+| **Phase 4: AI Rental Assistant** | 24/7 Chatbot & automated lead generator | **Skipped / On Hold** per client decision |
 | **Phase 5: Admin Operations (`/admin`)** | Full 8-page admin suite (Dispatch, Pipeline, Calendar, Permits, Reviews, Fleet, Settings, Manual) | **100% COMPLETE** & Verified (`npm run build`) |
-| **Phase 6: Database & Backend** | Real database tables, Server Actions, auth, and notification integrations | **READY TO BUILD** (Next Phase upon Client Approval) |
-| **Phase 7: Plesk Transfer** | Production environment configuration & live domain cutover | Documented in Plan & Tracker |
+| **Phase 6: Database & Backend** | Database tables, Server Actions, auth, notification microservices | **Deferred / Post-Launch Enhancement** per Client Directive |
+| **Phase 7: Plesk Production Cutover** | Node.js Phusion Passenger setup, server.js startup file, and live cutover | **IN PROGRESS / READY TO DEPLOY** |
 
 ---
 *Created for J-Bone Industries / AZ Rental Guy project lead & development team.*
