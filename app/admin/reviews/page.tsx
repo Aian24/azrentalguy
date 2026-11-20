@@ -183,7 +183,8 @@ export default function ReviewBoosterPage() {
 
       {/* SCALABLE REVIEWS DATA TABLE */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* DESKTOP TABLE */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse">
             <thead className="bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
               <tr>
@@ -242,13 +243,12 @@ export default function ReviewBoosterPage() {
                   {/* STATUS */}
                   <td className="py-3.5 px-4 whitespace-nowrap">
                     <span
-                      className={`text-xs font-bold uppercase px-2.5 py-1 rounded border inline-flex items-center gap-1.5 ${
-                        item.queueStatus === "reviewed"
+                      className={`text-xs font-bold uppercase px-2.5 py-1 rounded border inline-flex items-center gap-1.5 ${item.queueStatus === "reviewed"
                           ? "bg-emerald-100 text-emerald-900 border-emerald-400"
                           : item.queueStatus === "sent"
-                          ? "bg-yellow-100 text-yellow-900 border-yellow-400"
-                          : "bg-red-50 text-red-800 border-red-300"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-900 border-yellow-400"
+                            : "bg-red-50 text-red-800 border-red-300"
+                        }`}
                     >
                       {item.queueStatus === "reviewed" ? (
                         <>
@@ -279,7 +279,7 @@ export default function ReviewBoosterPage() {
                     {item.queueStatus === "queued" ? (
                       <button
                         onClick={() => handleSendNow(item.id, item.customerName)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-gray-950 font-bold px-3 py-1.5 rounded text-xs border border-yellow-500 flex items-center gap-1.5 transition-colors shadow-xs ml-auto"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-gray-950 font-bold px-3 py-1.5 rounded text-xs border border-yellow-500 flex items-center gap-1.5 transition-colors shadow-xs ml-auto cursor-pointer"
                       >
                         <Send className="w-3.5 h-3.5" />
                         <span>Send Now</span>
@@ -287,7 +287,7 @@ export default function ReviewBoosterPage() {
                     ) : (
                       <button
                         onClick={() => handleSendNow(item.id, item.customerName)}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-1.5 rounded text-xs border border-gray-300 transition-colors ml-auto"
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-1.5 rounded text-xs border border-gray-300 transition-colors ml-auto cursor-pointer"
                       >
                         Resend SMS
                       </button>
@@ -307,38 +307,133 @@ export default function ReviewBoosterPage() {
           </table>
         </div>
 
+        {/* MOBILE CARDS VIEW (NO SWIPING) */}
+        <div className="md:hidden divide-y divide-gray-200">
+          {displayedReviews.map((item) => (
+            <div key={item.id} className="p-3.5 space-y-2.5 bg-white hover:bg-yellow-50/30 transition-colors">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <span className="font-mono font-bold text-gray-500 text-xs">{item.id}</span>
+                  <div className="font-black text-gray-950 text-sm truncate mt-0.5">{item.customerName}</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <span
+                    className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border inline-flex items-center gap-1 ${item.queueStatus === "reviewed"
+                        ? "bg-emerald-100 text-emerald-900 border-emerald-400"
+                        : item.queueStatus === "sent"
+                          ? "bg-yellow-100 text-yellow-900 border-yellow-400"
+                          : "bg-red-50 text-red-800 border-red-300"
+                      }`}
+                  >
+                    {item.queueStatus === "reviewed" ? (
+                      <>
+                        <Star className="w-3 h-3 fill-emerald-600 text-emerald-600" />
+                        <span>5-Star</span>
+                      </>
+                    ) : item.queueStatus === "sent" ? (
+                      <>
+                        <Check className="w-3 h-3 text-yellow-700" />
+                        <span>Sent</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-3 h-3 text-red-600" />
+                        <span>Queued</span>
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-2.5 rounded border border-gray-100 space-y-1 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 font-medium">Returned Unit:</span>
+                  <span className="font-bold text-gray-900 text-right truncate max-w-[200px]">
+                    {item.equipmentName}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 font-medium">Return Date:</span>
+                  <span className="font-semibold text-gray-800">{item.returnDate}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 font-medium">Last Sent:</span>
+                  <span className="text-gray-600">{item.sentAt || "Pending"}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-0.5 text-xs">
+                <a
+                  href={`tel:${item.phone}`}
+                  className="font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>{item.phone}</span>
+                </a>
+                <div>
+                  {item.queueStatus === "queued" ? (
+                    <button
+                      onClick={() => handleSendNow(item.id, item.customerName)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-gray-950 font-bold px-3 py-1.5 rounded text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Send SMS</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleSendNow(item.id, item.customerName)}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-1.5 rounded text-xs border border-gray-300 transition-colors cursor-pointer"
+                    >
+                      Resend SMS
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {displayedReviews.length === 0 && (
+            <div className="py-8 text-center text-gray-400 font-medium text-sm">
+              No review records found matching criteria.
+            </div>
+          )}
+        </div>
+
         {/* PAGINATION CONTROLS */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
-          <span className="text-gray-600 font-medium">
+        <div className="p-4 border-t border-gray-200 bg-gray-50/80 flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:justify-between">
+          <span className="text-xs font-semibold text-gray-600 order-2 sm:order-1">
             Showing{" "}
-            <strong className="text-gray-900">
-              {filteredReviews.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}-
+            <strong className="text-gray-950 font-bold">
+              {filteredReviews.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}
+            </strong>{" "}
+            to{" "}
+            <strong className="text-gray-950 font-bold">
               {Math.min(currentPage * rowsPerPage, filteredReviews.length)}
             </strong>{" "}
-            of <strong className="text-gray-900">{filteredReviews.length}</strong> queue items
+            of <strong className="text-gray-950 font-bold">{filteredReviews.length}</strong> queue items
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 bg-white p-1 rounded-lg border border-gray-300 shadow-2xs order-1 sm:order-2">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 text-xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Prev</span>
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Previous</span>
             </button>
 
-            <span className="text-xs font-bold text-gray-700 px-2">
-              Page {currentPage} of {totalPages}
+            <span className="px-3 py-1 rounded-md bg-gray-100 text-gray-950 font-black text-xs min-w-[85px] text-center">
+              Page {currentPage} of {totalPages || 1}
             </span>
 
             <button
               disabled={currentPage >= totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 text-xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
             >
               <span>Next</span>
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

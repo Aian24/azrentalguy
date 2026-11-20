@@ -140,11 +140,10 @@ export default function FleetCalendarPage() {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
-                  activeCategory === cat.id
+                className={`px-3 py-1 text-xs font-bold rounded transition-colors ${activeCategory === cat.id
                     ? "bg-red-600 text-white shadow-xs"
                     : "text-gray-700 hover:text-gray-900"
-                }`}
+                  }`}
               >
                 {cat.label}
               </button>
@@ -183,9 +182,8 @@ export default function FleetCalendarPage() {
               {days.map((day) => (
                 <div
                   key={day.dateStr}
-                  className={`p-2 border-r border-gray-200 ${
-                    day.isWeekend ? "bg-yellow-50 text-yellow-900" : ""
-                  }`}
+                  className={`p-2 border-r border-gray-200 ${day.isWeekend ? "bg-yellow-50 text-yellow-900" : ""
+                    }`}
                 >
                   <div className="text-[10px] text-gray-500">{day.dayName}</div>
                   <div className="text-xs font-bold">{day.dayNum}</div>
@@ -235,10 +233,10 @@ export default function FleetCalendarPage() {
                           activeBooking.status === "active"
                             ? "bg-red-600 text-white"
                             : activeBooking.status === "reserved"
-                            ? "bg-emerald-600 text-white"
-                            : activeBooking.status === "maintenance"
-                            ? "bg-gray-500 text-white"
-                            : "bg-yellow-500 text-gray-950";
+                              ? "bg-emerald-600 text-white"
+                              : activeBooking.status === "maintenance"
+                                ? "bg-gray-500 text-white"
+                                : "bg-yellow-500 text-gray-950";
 
                         content = (
                           <div
@@ -343,7 +341,8 @@ export default function FleetCalendarPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* DESKTOP TABLE */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse">
             <thead className="bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
               <tr>
@@ -390,13 +389,12 @@ export default function FleetCalendarPage() {
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <span
-                        className={`text-xs font-bold uppercase px-2 py-0.5 rounded border ${
-                          b.status === "active"
+                        className={`text-xs font-bold uppercase px-2 py-0.5 rounded border ${b.status === "active"
                             ? "bg-red-600 text-white border-red-600"
                             : b.status === "reserved"
-                            ? "bg-emerald-100 text-emerald-900 border-emerald-400"
-                            : "bg-gray-200 text-gray-800 border-gray-300"
-                        }`}
+                              ? "bg-emerald-100 text-emerald-900 border-emerald-400"
+                              : "bg-gray-200 text-gray-800 border-gray-300"
+                          }`}
                       >
                         {b.status}
                       </span>
@@ -407,7 +405,7 @@ export default function FleetCalendarPage() {
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       <button
                         onClick={() => setSelectedBooking(b)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-gray-950 font-bold px-3 py-1 rounded text-xs transition-colors"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-gray-950 font-bold px-3 py-1 rounded text-xs transition-colors cursor-pointer"
                       >
                         Details
                       </button>
@@ -427,38 +425,108 @@ export default function FleetCalendarPage() {
           </table>
         </div>
 
+        {/* MOBILE CARDS VIEW (NO SWIPING) */}
+        <div className="md:hidden divide-y divide-gray-200">
+          {displayedBookings.map((b) => {
+            const machine = FLEET.find((f) => f.id === b.equipmentId);
+            return (
+              <div key={b.id} className="p-3.5 space-y-2.5 bg-white hover:bg-yellow-50/30 transition-colors">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <span className="font-mono font-bold text-gray-500 text-xs">{b.id}</span>
+                    <div className="font-black text-gray-950 text-sm truncate mt-0.5">{b.customerName}</div>
+                    {b.companyName && (
+                      <div className="text-xs text-gray-500 font-medium truncate">{b.companyName}</div>
+                    )}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span
+                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border inline-block ${b.status === "active"
+                          ? "bg-red-600 text-white border-red-600"
+                          : b.status === "reserved"
+                            ? "bg-emerald-100 text-emerald-900 border-emerald-400"
+                            : "bg-gray-200 text-gray-800 border-gray-300"
+                        }`}
+                    >
+                      {b.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 p-2.5 rounded border border-gray-100 space-y-1 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 font-medium">Machine:</span>
+                    <span className="font-bold text-gray-900 text-right truncate max-w-[200px]">
+                      {machine ? machine.name : b.equipmentId}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 font-medium">Schedule:</span>
+                    <span className="font-semibold text-gray-800">
+                      {b.startDate} → {b.endDate}
+                    </span>
+                  </div>
+                  {b.notes && (
+                    <div className="text-gray-600 text-[11px] pt-1 border-t border-gray-200/60 truncate">
+                      Notes: {b.notes}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-end pt-0.5 text-xs">
+                  <button
+                    onClick={() => setSelectedBooking(b)}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-950 font-bold py-1.5 rounded text-xs transition-colors cursor-pointer text-center"
+                  >
+                    View Booking Details
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+
+          {displayedBookings.length === 0 && (
+            <div className="py-8 text-center text-gray-400 font-medium text-sm">
+              No bookings found matching criteria.
+            </div>
+          )}
+        </div>
+
         {/* PAGINATION CONTROLS */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
-          <span className="text-gray-600 font-medium">
+        <div className="p-4 border-t border-gray-200 bg-gray-50/80 flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:justify-between">
+          <span className="text-xs font-semibold text-gray-600 order-2 sm:order-1">
             Showing{" "}
-            <strong className="text-gray-900">
-              {filteredBookings.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}-
+            <strong className="text-gray-950 font-bold">
+              {filteredBookings.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}
+            </strong>{" "}
+            to{" "}
+            <strong className="text-gray-950 font-bold">
               {Math.min(currentPage * rowsPerPage, filteredBookings.length)}
             </strong>{" "}
-            of <strong className="text-gray-900">{filteredBookings.length}</strong> bookings
+            of <strong className="text-gray-950 font-bold">{filteredBookings.length}</strong> bookings
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 bg-white p-1 rounded-lg border border-gray-300 shadow-2xs order-1 sm:order-2">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 text-xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Prev</span>
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Previous</span>
             </button>
 
-            <span className="text-xs font-bold text-gray-700 px-2">
-              Page {currentPage} of {totalPages}
+            <span className="px-3 py-1 rounded-md bg-gray-100 text-gray-950 font-black text-xs min-w-[85px] text-center">
+              Page {currentPage} of {totalPages || 1}
             </span>
 
             <button
               disabled={currentPage >= totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 text-xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
             >
               <span>Next</span>
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

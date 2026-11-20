@@ -231,11 +231,10 @@ export default function AdminDispatchPage() {
             setCustomDate("");
             setDispatchPage(1);
           }}
-          className={`bg-white border-2 p-4 rounded-lg shadow-xs transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg cursor-pointer group active:scale-[0.98] ${
-            dateFilter === "today" && !customDate
+          className={`bg-white border-2 p-4 rounded-lg shadow-xs transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg cursor-pointer group active:scale-[0.98] ${dateFilter === "today" && !customDate
               ? "border-red-600 ring-2 ring-red-600/30 bg-red-50/20"
               : "border-red-600 hover:bg-red-50/10"
-          }`}
+            }`}
           title="Click to view Today's Dispatches"
         >
           <div className="flex items-center justify-between">
@@ -263,11 +262,10 @@ export default function AdminDispatchPage() {
             setCustomDate("");
             setDispatchPage(1);
           }}
-          className={`bg-white border-2 p-4 rounded-lg shadow-xs transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg cursor-pointer group active:scale-[0.98] ${
-            dateFilter === "tomorrow" && !customDate
+          className={`bg-white border-2 p-4 rounded-lg shadow-xs transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg cursor-pointer group active:scale-[0.98] ${dateFilter === "tomorrow" && !customDate
               ? "border-yellow-500 ring-2 ring-yellow-500/30 bg-yellow-50/20"
               : "border-yellow-500 hover:bg-yellow-50/10"
-          }`}
+            }`}
           title="Click to view Tomorrow's Pre-Staged Dispatches"
         >
           <div className="flex items-center justify-between">
@@ -295,11 +293,10 @@ export default function AdminDispatchPage() {
             setCustomDate("");
             setDispatchPage(1);
           }}
-          className={`bg-white border-2 p-4 rounded-lg shadow-xs transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg cursor-pointer group active:scale-[0.98] ${
-            dateFilter === "past" && !customDate
+          className={`bg-white border-2 p-4 rounded-lg shadow-xs transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lg cursor-pointer group active:scale-[0.98] ${dateFilter === "past" && !customDate
               ? "border-gray-400 ring-2 ring-gray-400/30 bg-gray-50"
               : "border-gray-200 hover:bg-gray-50"
-          }`}
+            }`}
           title="Click to view Past & Completed Dispatches"
         >
           <div className="flex items-center justify-between">
@@ -344,29 +341,10 @@ export default function AdminDispatchPage() {
 
       {/* SINGLE PRIMARY DATA TABLE: DISPATCH SCHEDULE */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        {/* COMPACT TOOLBAR (ALL FILTERS LEFT-ALIGNED) */}
-        <div className="p-3.5 border-b border-gray-200 flex flex-wrap items-center gap-2.5 bg-gray-50">
-          {/* SHOW ENTRIES SELECTOR (DEFAULT 10) */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
-            <span>Show</span>
-            <select
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setDispatchPage(1);
-              }}
-              className="h-9 px-2 border border-gray-300 rounded font-bold bg-white text-gray-900 focus:border-red-600 focus:outline-none text-xs cursor-pointer"
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-            <span>entries</span>
-          </div>
-
+        {/* COMPACT TOOLBAR */}
+        <div className="p-3.5 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
           {/* SEARCH */}
-          <div className="relative min-w-[200px] max-w-xs">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
             <input
               type="text"
@@ -380,7 +358,8 @@ export default function AdminDispatchPage() {
             />
           </div>
 
-          {/* DATE FILTER DROPDOWN */}
+          {/* DATE & STATUS FILTERS */}
+          <div className="flex flex-wrap items-center gap-2">
           <select
             value={customDate ? "custom" : dateFilter}
             onChange={(e) => {
@@ -391,15 +370,14 @@ export default function AdminDispatchPage() {
                 setDispatchPage(1);
               }
             }}
-            className={`h-9 px-3 border rounded text-xs font-bold focus:outline-none cursor-pointer transition-colors shadow-2xs ${
-              dateFilter === "today" && !customDate
+            className={`h-9 px-3 border rounded text-xs font-bold focus:outline-none cursor-pointer transition-colors shadow-2xs ${dateFilter === "today" && !customDate
                 ? "bg-red-600 text-white border-red-600 shadow-xs"
                 : dateFilter === "tomorrow" && !customDate
-                ? "bg-yellow-500 text-gray-950 border-yellow-500"
-                : dateFilter === "yesterday" && !customDate
-                ? "bg-gray-200 text-gray-800 border-gray-400"
-                : "bg-white text-gray-800 border-gray-300"
-            }`}
+                  ? "bg-yellow-500 text-gray-950 border-yellow-500"
+                  : dateFilter === "yesterday" && !customDate
+                    ? "bg-gray-200 text-gray-800 border-gray-400"
+                    : "bg-white text-gray-800 border-gray-300"
+              }`}
           >
             <option value="all" className="bg-white text-gray-800 font-semibold">
               All Dates ({allCount})
@@ -450,19 +428,18 @@ export default function AdminDispatchPage() {
               setDispatchStatus(e.target.value);
               setDispatchPage(1);
             }}
-            className={`h-9 px-3 border rounded text-xs font-bold focus:outline-none cursor-pointer transition-colors shadow-2xs ${
-              dispatchStatus === "scheduled"
+            className={`h-9 px-3 border rounded text-xs font-bold focus:outline-none cursor-pointer transition-colors shadow-2xs ${dispatchStatus === "scheduled"
                 ? "bg-yellow-100 text-yellow-950 border-yellow-400"
                 : dispatchStatus === "dispatched"
-                ? "bg-red-50 text-red-800 border-red-300"
-                : dispatchStatus === "on-site"
-                ? "bg-red-600 text-white border-red-600 shadow-xs"
-                : dispatchStatus === "completed"
-                ? "bg-emerald-100 text-emerald-900 border-emerald-400"
-                : dispatchStatus === "delayed"
-                ? "bg-red-100 text-red-900 border-red-500"
-                : "bg-white text-gray-800 border-gray-300"
-            }`}
+                  ? "bg-red-50 text-red-800 border-red-300"
+                  : dispatchStatus === "on-site"
+                    ? "bg-red-600 text-white border-red-600 shadow-xs"
+                    : dispatchStatus === "completed"
+                      ? "bg-emerald-100 text-emerald-900 border-emerald-400"
+                      : dispatchStatus === "delayed"
+                        ? "bg-red-100 text-red-900 border-red-500"
+                        : "bg-white text-gray-800 border-gray-300"
+              }`}
           >
             <option value="all" className="bg-white text-gray-800 font-semibold">
               All Statuses ({dispatchList.length})
@@ -483,10 +460,30 @@ export default function AdminDispatchPage() {
               Delayed ({dispatchList.filter((d) => d.status === "delayed").length})
             </option>
           </select>
-        </div>
 
-        {/* DATA TABLE */}
-        <div className="overflow-x-auto">
+          {/* SHOW ENTRIES SELECTOR */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium ml-auto">
+            <span>Show</span>
+            <select
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setDispatchPage(1);
+              }}
+              className="h-9 px-2 border border-gray-300 rounded font-bold bg-white text-gray-900 focus:border-red-600 focus:outline-none text-xs cursor-pointer"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>entries</span>
+          </div>
+        </div>
+      </div>
+
+        {/* DESKTOP DATA TABLE */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse">
             <thead className="bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
               <tr>
@@ -581,9 +578,8 @@ export default function AdminDispatchPage() {
                       onChange={(e) =>
                         handleStatusChange(item.id, e.target.value as DispatchItem["status"])
                       }
-                      className={`text-xs font-bold px-2.5 py-1 rounded border focus:outline-none cursor-pointer transition-colors shadow-2xs ${
-                        STATUS_CONFIG[item.status].selectClass
-                      }`}
+                      className={`text-xs font-bold px-2.5 py-1 rounded border focus:outline-none cursor-pointer transition-colors shadow-2xs ${STATUS_CONFIG[item.status].selectClass
+                        }`}
                     >
                       <option value="scheduled" className="bg-white text-yellow-950 font-bold">
                         Scheduled
@@ -626,35 +622,133 @@ export default function AdminDispatchPage() {
           </table>
         </div>
 
+        {/* MOBILE CARDS VIEW (NO SWIPING) */}
+        <div className="md:hidden divide-y divide-gray-200">
+          {displayedDispatch.map((item) => (
+            <div key={item.id} className="p-3.5 space-y-2.5 bg-white hover:bg-yellow-50/30 transition-colors">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-gray-500 text-xs">{item.id}</span>
+                    {item.scheduledDate === todayStr ? (
+                      <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[10px]">
+                        Today
+                      </span>
+                    ) : item.scheduledDate === tomorrowStr ? (
+                      <span className="px-1.5 py-0.5 rounded bg-yellow-500 text-gray-950 font-black text-[10px]">
+                        Tomorrow
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="font-black text-gray-950 text-sm truncate mt-0.5">{item.customerName}</div>
+                  {item.companyName && (
+                    <div className="text-xs text-gray-500 font-medium truncate">{item.companyName}</div>
+                  )}
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="font-black text-gray-950 text-base leading-none">
+                    ${item.amount.toLocaleString()}
+                  </div>
+                  <div className="mt-1">
+                    <select
+                      value={item.status}
+                      onChange={(e) =>
+                        handleStatusChange(item.id, e.target.value as DispatchItem["status"])
+                      }
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded border focus:outline-none cursor-pointer ${STATUS_CONFIG[item.status].selectClass
+                        }`}
+                    >
+                      <option value="scheduled">Scheduled</option>
+                      <option value="dispatched">Dispatched</option>
+                      <option value="on-site">On-Site</option>
+                      <option value="completed">Completed</option>
+                      <option value="delayed">Delayed</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-2.5 rounded border border-gray-100 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 font-medium">Machine:</span>
+                  <span className="font-bold text-gray-900 text-right truncate max-w-[200px]">
+                    {item.equipmentName}
+                  </span>
+                </div>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-gray-500 font-medium shrink-0">Jobsite:</span>
+                  <div className="text-right min-w-0">
+                    <div className="font-semibold text-gray-800 truncate max-w-[200px]">
+                      {item.jobsiteAddress}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 font-medium">Slot & Driver:</span>
+                  <span className="text-gray-700 font-medium">
+                    {item.scheduledTime} • {item.driver}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-0.5 text-xs">
+                <a
+                  href={`tel:${item.phone}`}
+                  className="font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>{item.phone}</span>
+                </a>
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(item.jobsiteAddress)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 bg-gray-100 hover:bg-yellow-50 text-gray-800 text-xs font-bold rounded border border-gray-300 inline-flex items-center gap-1"
+                >
+                  <MapPin className="w-3 h-3 text-red-600" />
+                  <span>Google Map</span>
+                </a>
+              </div>
+            </div>
+          ))}
+
+          {displayedDispatch.length === 0 && (
+            <div className="py-8 text-center text-gray-400 font-medium text-sm">
+              No dispatches found matching this date and search filter.
+            </div>
+          )}
+        </div>
+
         {/* PAGINATION */}
-        <div className="p-3.5 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-gray-600 bg-gray-50">
-          <span className="font-medium">
+        <div className="p-4 border-t border-gray-200 bg-gray-50/80 flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:justify-between">
+          <span className="text-xs font-semibold text-gray-600 order-2 sm:order-1">
             Showing{" "}
-            <strong className="text-gray-900">
+            <strong className="text-gray-950 font-bold">
               {filteredDispatch.length === 0 ? 0 : (dispatchPage - 1) * rowsPerPage + 1}
             </strong>{" "}
             to{" "}
-            <strong className="text-gray-900">
+            <strong className="text-gray-950 font-bold">
               {Math.min(dispatchPage * rowsPerPage, filteredDispatch.length)}
             </strong>{" "}
-            of <strong className="text-gray-900">{filteredDispatch.length}</strong> dispatches
+            of <strong className="text-gray-950 font-bold">{filteredDispatch.length}</strong> dispatches
           </span>
-          <div className="flex items-center gap-2">
+
+          <div className="inline-flex items-center gap-1.5 bg-white p-1 rounded-lg border border-gray-300 shadow-2xs order-1 sm:order-2">
             <button
               disabled={dispatchPage === 1}
               onClick={() => setDispatchPage((p) => Math.max(1, p - 1))}
-              className="px-3 py-1 border border-gray-300 rounded font-bold hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-xs flex items-center gap-1 cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               <span>Previous</span>
             </button>
-            <span className="font-bold text-gray-900 text-xs px-1">
-              Page {dispatchPage} of {totalDispatchPages}
+            <span className="px-3 py-1 rounded-md bg-gray-100 text-gray-950 font-black text-xs min-w-[85px] text-center">
+              Page {dispatchPage} of {totalDispatchPages || 1}
             </span>
             <button
               disabled={dispatchPage >= totalDispatchPages}
               onClick={() => setDispatchPage((p) => Math.min(totalDispatchPages, p + 1))}
-              className="px-3 py-1 border border-gray-300 rounded font-bold hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed text-xs flex items-center gap-1 cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
             >
               <span>Next</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -704,8 +798,8 @@ export default function AdminDispatchPage() {
               </span>
             </div>
 
-            {/* MODAL TABLE */}
-            <div className="overflow-x-auto max-h-[420px]">
+            {/* DESKTOP MODAL TABLE */}
+            <div className="hidden md:block overflow-x-auto max-h-[420px]">
               <table className="w-full text-sm text-left border-collapse">
                 <thead className="bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200 sticky top-0">
                   <tr>
@@ -746,16 +840,14 @@ export default function AdminDispatchPage() {
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap">
                         <span
-                          className={`text-xs font-bold px-2.5 py-1 rounded border inline-flex items-center gap-1.5 ${
-                            h.signatureStatus === "signed"
+                          className={`text-xs font-bold px-2.5 py-1 rounded border inline-flex items-center gap-1.5 ${h.signatureStatus === "signed"
                               ? "bg-emerald-100 text-emerald-900 border-emerald-400 font-bold"
                               : "bg-red-50 text-red-800 border-red-300 font-bold"
-                          }`}
+                            }`}
                         >
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              h.signatureStatus === "signed" ? "bg-emerald-600" : "bg-red-600"
-                            }`}
+                            className={`w-1.5 h-1.5 rounded-full ${h.signatureStatus === "signed" ? "bg-emerald-600" : "bg-red-600"
+                              }`}
                           />
                           <span>{h.signatureStatus === "signed" ? "Signed" : "Pending"}</span>
                         </span>
@@ -787,6 +879,74 @@ export default function AdminDispatchPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            {/* MOBILE MODAL CARDS VIEW (NO SWIPING) */}
+            <div className="md:hidden divide-y divide-gray-200 max-h-[420px] overflow-y-auto">
+              {displayedHolds.map((h) => (
+                <div key={h.id} className="p-3 space-y-2 bg-white">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-gray-500 text-xs">{h.id}</span>
+                        <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.2 rounded">
+                          {h.hoursRemaining}h left
+                        </span>
+                      </div>
+                      <div className="font-black text-gray-950 text-sm truncate mt-0.5">{h.customerName}</div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-black text-gray-950 text-sm">
+                        ${h.totalAmount.toLocaleString()}
+                      </div>
+                      <span
+                        className={`inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded border ${h.signatureStatus === "signed"
+                            ? "bg-emerald-100 text-emerald-900 border-emerald-400"
+                            : "bg-red-50 text-red-800 border-red-300"
+                          }`}
+                      >
+                        {h.signatureStatus === "signed" ? "Signed" : "Pending"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-2 rounded border border-gray-100 text-xs space-y-1">
+                    <div className="font-bold text-gray-900 truncate">{h.equipmentName}</div>
+                    <div className="text-gray-500 text-[11px] font-medium">
+                      Dates: {h.startDate} → {h.endDate}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 text-xs">
+                    <a
+                      href={`tel:${h.phone}`}
+                      className="font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{h.phone}</span>
+                    </a>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleSendReminder(h.customerName, h.phone)}
+                        className="px-2.5 py-1 bg-yellow-500 hover:bg-yellow-600 text-gray-950 font-bold rounded text-xs transition-colors cursor-pointer"
+                      >
+                        SMS
+                      </button>
+                      <button
+                        onClick={() => handleReleaseHold(h.id, h.equipmentName)}
+                        className="px-2 py-1 bg-gray-100 hover:bg-red-100 hover:text-red-700 text-gray-600 font-semibold rounded text-xs transition-colors cursor-pointer"
+                      >
+                        Release
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {displayedHolds.length === 0 && (
+                <div className="py-6 text-center text-gray-500 text-sm">
+                  No active holds found.
+                </div>
+              )}
             </div>
 
             {/* MODAL FOOTER */}
@@ -876,8 +1036,8 @@ export default function AdminDispatchPage() {
                 </div>
               </div>
 
-              {/* STOPS TABLE */}
-              <div className="border border-gray-200 rounded-lg overflow-x-auto">
+              {/* STOPS TABLE (DESKTOP & PRINT) */}
+              <div className="hidden sm:block border border-gray-200 rounded-lg overflow-x-auto print:block">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-gray-100 text-gray-700 uppercase font-black tracking-wider text-[11px] border-b border-gray-200">
                     <tr>
@@ -935,13 +1095,12 @@ export default function AdminDispatchPage() {
                         </td>
                         <td className="py-3 px-3 text-center whitespace-nowrap">
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                              item.type === "delivery"
+                            className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${item.type === "delivery"
                                 ? "bg-red-100 text-red-800"
                                 : item.type === "return"
-                                ? "bg-yellow-100 text-yellow-900"
-                                : "bg-blue-100 text-blue-800"
-                            }`}
+                                  ? "bg-yellow-100 text-yellow-900"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
                           >
                             {item.type}
                           </span>
@@ -956,6 +1115,53 @@ export default function AdminDispatchPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* STOPS MOBILE CARDS (SCREEN ONLY) */}
+              <div className="sm:hidden print:hidden divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                {filteredDispatch.map((item, idx) => (
+                  <div key={item.id} className="p-3 space-y-2 bg-white">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-5 h-5 rounded-full bg-red-600 text-white inline-flex items-center justify-center text-[10px] font-black">
+                          {idx + 1}
+                        </span>
+                        <span className="font-mono font-black text-gray-950 text-xs">
+                          {item.scheduledTime}
+                        </span>
+                      </div>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${item.type === "delivery"
+                            ? "bg-red-100 text-red-800"
+                            : item.type === "return"
+                              ? "bg-yellow-100 text-yellow-900"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                      >
+                        {item.type}
+                      </span>
+                    </div>
+
+                    <div className="bg-gray-50 p-2 rounded text-xs space-y-1">
+                      <div className="font-bold text-gray-950">{item.equipmentName}</div>
+                      <div className="text-gray-700">Driver: <span className="font-bold">{item.driver || "Unassigned"}</span></div>
+                      <div className="text-gray-600 truncate">{item.customerName} • {item.phone}</div>
+                      <div className="text-gray-800 font-medium pt-1 border-t border-gray-200/60 truncate">
+                        {item.jobsiteAddress}
+                      </div>
+                      {item.notes && (
+                        <div className="text-[10px] text-yellow-900 font-bold bg-yellow-100 p-1 rounded">
+                          Note: {item.notes}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {filteredDispatch.length === 0 && (
+                  <div className="py-6 text-center text-gray-400 text-xs">
+                    No dispatches found for this date.
+                  </div>
+                )}
               </div>
             </div>
 

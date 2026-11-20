@@ -23,6 +23,10 @@ import {
   LogOut,
   BookOpen,
   Wrench,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/fleet";
 import PhoneInLeadModal from "@/components/admin/PhoneInLeadModal";
@@ -38,6 +42,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [azTime, setAzTime] = useState("");
   const [appSettings, setAppSettings] = useState<AppSettings>(getStoredSettings());
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("az_admin_sidebar_collapsed");
+      if (saved === "true") {
+        setIsSidebarCollapsed(true);
+      }
+    } catch { }
+  }, []);
+
+  const toggleSidebarCollapse = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("az_admin_sidebar_collapsed", String(next));
+      } catch { }
+      return next;
+    });
+  };
 
   // WORKING 48-HR HOLDS NOTIFICATION POPOVER STATE
   const [isHoldsDropdownOpen, setIsHoldsDropdownOpen] = useState(false);
@@ -171,31 +195,57 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       )}
 
-      {/* MODERN LIGHT SIDEBAR WITH DYNAMIC BRANDING */}
+      {/* MODERN LIGHT SIDEBAR WITH DYNAMIC BRANDING & DESKTOP COLLAPSE */}
       <aside
-        className={`fixed md:sticky top-0 left-0 z-50 h-screen w-72 bg-white border-r border-gray-200 flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xs ${
-          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
+        className={`fixed md:sticky top-0 left-0 z-50 h-screen bg-white border-r border-gray-200 flex flex-col justify-between transition-all duration-300 ease-in-out shadow-xs ${mobileSidebarOpen ? "translate-x-0 w-72" : "-translate-x-full md:translate-x-0"
+          } ${isSidebarCollapsed ? "md:w-20" : "md:w-64"}`}
       >
-        <div className="overflow-y-auto">
-          {/* LOGO HEADER */}
-          <div className="p-4 border-b border-gray-200 bg-white flex items-center justify-between">
-            <Link href="/admin" className="flex items-center gap-2.5 group">
-              <img
-                src={appSettings.logoUrl}
-                alt={appSettings.companyName}
-                style={{ height: `${appSettings.logoSize}px` }}
-                className="w-auto object-contain transition-transform group-hover:scale-105"
-              />
-              <div>
-                <span className="text-red-600 font-black text-base sm:text-lg tracking-tight block leading-none">
-                  {appSettings.companyName.toUpperCase()}
-                </span>
-                <span className="text-xs font-extrabold text-yellow-600 uppercase tracking-wider block mt-1">
-                  Operator Admin Hub
-                </span>
-              </div>
-            </Link>
+        <div className="overflow-y-auto overflow-x-hidden">
+          {/* LOGO HEADER & COLLAPSE TOGGLE */}
+          <div className="p-3.5 border-b border-gray-200 bg-white flex items-center justify-between gap-2">
+            {!isSidebarCollapsed ? (
+              <Link href="/admin" className="flex items-center gap-2.5 group min-w-0">
+                <img
+                  src={appSettings.logoUrl}
+                  alt={appSettings.companyName}
+                  style={{ height: `${Math.min(appSettings.logoSize, 34)}px` }}
+                  className="w-auto object-contain transition-transform group-hover:scale-105 shrink-0"
+                />
+                <div className="min-w-0">
+                  <span className="text-red-600 font-black text-sm tracking-tight block leading-none truncate">
+                    {appSettings.companyName.toUpperCase()}
+                  </span>
+                  <span className="text-[10px] font-extrabold text-yellow-600 uppercase tracking-wider block mt-1">
+                    Operator Admin Hub
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <Link href="/admin" className="mx-auto block" title={appSettings.companyName}>
+                <img
+                  src={appSettings.logoUrl}
+                  alt={appSettings.companyName}
+                  className="h-8 w-8 object-contain"
+                />
+              </Link>
+            )}
+
+            {/* DESKTOP COLLAPSE / EXPAND TOGGLE BUTTON */}
+            <button
+              type="button"
+              onClick={toggleSidebarCollapse}
+              className={`hidden md:flex p-1.5 text-gray-500 hover:text-red-600 hover:bg-gray-100 rounded transition-colors cursor-pointer shrink-0 ${isSidebarCollapsed ? "mx-auto mt-2" : ""
+                }`}
+              title={isSidebarCollapsed ? "Expand sidebar (full labels)" : "Collapse sidebar (icons only)"}
+            >
+              {isSidebarCollapsed ? (
+                <PanelLeftOpen className="w-5 h-5 text-gray-700 hover:text-red-600" />
+              ) : (
+                <PanelLeftClose className="w-5 h-5 text-gray-700 hover:text-red-600" />
+              )}
+            </button>
+
+            {/* MOBILE CLOSE */}
             <button
               onClick={() => setMobileSidebarOpen(false)}
               className="md:hidden text-gray-500 hover:text-gray-900 p-1 cursor-pointer"
@@ -205,27 +255,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           {/* QUICK STATUS */}
-          <div className="px-4 py-2.5 bg-yellow-50/60 border-b border-gray-100 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span className="text-gray-800 font-semibold text-xs">Cave Creek Yard</span>
+          <div
+            className={`px-3 py-2 bg-yellow-50/60 border-b border-gray-100 flex items-center text-xs ${isSidebarCollapsed ? "justify-center" : "justify-between"
+              }`}
+          >
+            <div className="flex items-center gap-1.5" title="Cave Creek Yard: Open">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse shrink-0"></span>
+              {!isSidebarCollapsed && (
+                <span className="text-gray-800 font-semibold text-xs truncate">Cave Creek Yard</span>
+              )}
             </div>
-            <span className="text-red-600 font-black text-xs tracking-wide">YARD OPEN</span>
+            {!isSidebarCollapsed && (
+              <span className="text-red-600 font-black text-[11px] tracking-wide shrink-0">YARD OPEN</span>
+            )}
           </div>
 
           {/* CTA: NEW LEAD MODAL */}
-          <div className="p-3.5">
+          <div className="p-2.5">
             <button
               onClick={() => setIsPhoneModalOpen(true)}
-              className="w-full bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-black py-2.5 px-4 rounded text-sm flex items-center justify-center gap-2 shadow-xs transition-all duration-150 cursor-pointer"
+              className={`w-full bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-black rounded text-sm flex items-center justify-center gap-2 shadow-xs transition-all duration-150 cursor-pointer ${isSidebarCollapsed ? "h-10 p-0" : "py-2 px-3"
+                }`}
+              title="Create New Lead / Hold"
             >
-              <Plus className="w-4 h-4" />
-              <span>New Lead / Hold</span>
+              <Plus className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && <span>New Lead / Hold</span>}
             </button>
           </div>
 
-          {/* NAV ITEMS WITH LARGER FONT SIZES */}
-          <nav className="px-3 space-y-1.5 pb-4">
+          {/* NAV ITEMS */}
+          <nav className="px-2 space-y-1 pb-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -238,29 +297,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileSidebarOpen(false)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded text-sm font-bold transition-all duration-200 cursor-pointer active:scale-[0.98] ${
-                    isActive
-                      ? "bg-red-50 text-red-600 border-l-4 border-red-600 shadow-xs translate-x-1 font-black"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-950 hover:translate-x-1.5 hover:shadow-2xs"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon
-                      className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                        isActive ? "text-red-600" : "text-yellow-600"
-                      }`}
-                    />
-                    <span className="text-sm font-extrabold tracking-tight">{item.label}</span>
-                  </div>
-                  <span
-                    className={`text-xs px-2.5 py-0.5 rounded font-black tracking-wide ${
-                      isActive
-                        ? "bg-red-600 text-white"
-                        : "bg-gray-100 text-gray-700"
+                  title={item.label}
+                  className={`flex items-center rounded transition-all duration-200 cursor-pointer active:scale-[0.98] ${isSidebarCollapsed ? "justify-center p-2.5" : "justify-between px-3 py-2 text-sm"
+                    } ${isActive
+                      ? "bg-red-50 text-red-600 border-l-4 border-red-600 font-black shadow-xs"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-950 font-bold"
                     }`}
-                  >
-                    {item.badge}
-                  </span>
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Icon
+                      className={`w-5 h-5 shrink-0 transition-colors ${isActive ? "text-red-600" : "text-yellow-600"
+                        }`}
+                    />
+                    {!isSidebarCollapsed && (
+                      <span className="text-sm font-extrabold tracking-tight truncate">
+                        {item.label}
+                      </span>
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <span
+                      className={`text-[11px] px-2 py-0.5 rounded font-black tracking-wide shrink-0 ${isActive ? "bg-red-600 text-white" : "bg-gray-100 text-gray-700"
+                        }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -268,53 +330,65 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* BOTTOM SHORTCUTS & OPERATOR LOGOUT */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50/70 space-y-2.5">
+        <div className="p-2.5 border-t border-gray-200 bg-gray-50/70 space-y-2">
           <Link
             href="/"
             target="_blank"
-            className="flex items-center justify-between text-gray-800 hover:text-red-600 bg-white border border-gray-200 px-3.5 py-2 rounded transition-all duration-150 text-xs font-bold hover:shadow-xs"
+            title="Live Website"
+            className={`flex items-center text-gray-800 hover:text-red-600 bg-white border border-gray-200 rounded transition-all text-xs font-bold hover:shadow-xs ${isSidebarCollapsed ? "justify-center p-2.5" : "justify-between px-3 py-2"
+              }`}
           >
-            <span className="flex items-center gap-2">
-              <ExternalLink className="w-3.5 h-3.5 text-yellow-600" />
-              Live Website
+            <span className="flex items-center gap-2 min-w-0">
+              <ExternalLink className="w-4 h-4 text-yellow-600 shrink-0" />
+              {!isSidebarCollapsed && <span className="truncate">Live Website</span>}
             </span>
-            <span className="text-[11px] text-red-600 font-extrabold bg-red-50 px-2 py-0.2 rounded">
-              AZ
-            </span>
+            {!isSidebarCollapsed && (
+              <span className="text-[10px] text-red-600 font-extrabold bg-red-50 px-1.5 py-0.5 rounded shrink-0">
+                AZ
+              </span>
+            )}
           </Link>
 
           {/* OPERATOR SIGN OUT */}
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center justify-between text-gray-700 hover:text-red-700 bg-white border border-gray-200 hover:border-red-300 px-3.5 py-2 rounded transition-all duration-150 text-xs font-bold hover:bg-red-50 cursor-pointer"
+            title="Operator Sign Out"
+            className={`w-full flex items-center text-gray-700 hover:text-red-700 bg-white border border-gray-200 hover:border-red-300 rounded transition-all text-xs font-bold hover:bg-red-50 cursor-pointer ${isSidebarCollapsed ? "justify-center p-2.5" : "justify-between px-3 py-2"
+              }`}
           >
-            <span className="flex items-center gap-2">
-              <LogOut className="w-3.5 h-3.5 text-red-600" />
-              Operator Sign Out
+            <span className="flex items-center gap-2 min-w-0">
+              <LogOut className="w-4 h-4 text-red-600 shrink-0" />
+              {!isSidebarCollapsed && <span className="truncate">Operator Sign Out</span>}
             </span>
-            <span className="text-[10px] uppercase font-bold text-gray-400">Lock</span>
+            {!isSidebarCollapsed && (
+              <span className="text-[10px] uppercase font-bold text-gray-400 shrink-0">Lock</span>
+            )}
           </button>
         </div>
       </aside>
 
       {/* MAIN CONTAINER */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* TOP BAR */}
-        <header className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
+        <header className="sticky top-0 z-30 bg-white border-b border-gray-200 px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
             <button
               onClick={() => setMobileSidebarOpen(true)}
-              className="md:hidden p-1.5 text-gray-700 hover:text-gray-950 border border-gray-300 rounded cursor-pointer"
+              className="md:hidden p-1.5 text-gray-700 hover:text-gray-950 border border-gray-300 rounded cursor-pointer shrink-0"
+              title="Open Navigation"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <span className="font-bold text-sm text-gray-900">
-              {appSettings.companyName} • Operations & Analytics
-            </span>
+            <div className="min-w-0 flex-1">
+              <span className="font-black text-xs sm:text-sm text-gray-950 truncate block leading-tight">
+                {appSettings.companyName}
+                <span className="hidden sm:inline font-bold text-gray-500"> • Operations & Analytics</span>
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <div className="hidden sm:flex items-center gap-1.5 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded text-xs">
               <Clock className="w-3.5 h-3.5 text-yellow-600" />
               <span className="text-gray-600 font-medium">Zone:</span>
@@ -377,11 +451,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             {hold.hoursRemaining}h left
                           </span>
                           <span
-                            className={`text-[10px] font-bold px-1.5 py-0.2 rounded inline-block mt-1 ${
-                              hold.signatureStatus === "signed"
+                            className={`text-[10px] font-bold px-1.5 py-0.2 rounded inline-block mt-1 ${hold.signatureStatus === "signed"
                                 ? "bg-emerald-100 text-emerald-800"
                                 : "bg-red-100 text-red-800"
-                            }`}
+                              }`}
                           >
                             {hold.signatureStatus === "signed" ? "Signed" : "Pending Signature"}
                           </span>

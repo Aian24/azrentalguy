@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import {
   FileText,
   Upload,
-  Sparkles,
+  Zap,
   Send,
   Copy,
   Check,
@@ -129,29 +129,10 @@ export default function PermitPipelinePage() {
       </div>
 
       {/* TOOLBAR */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
-        <div className="flex flex-wrap items-center gap-2 flex-1">
-          {/* SHOW ENTRIES SELECTOR (DEFAULT 10) */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
-            <span>Show</span>
-            <select
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="px-2 py-1.5 border border-gray-300 rounded font-bold bg-white text-gray-900 focus:border-red-600 focus:outline-none text-xs"
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-            <span>entries</span>
-          </div>
-
+      <div className="bg-white p-3.5 rounded-lg border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 flex-1">
           {/* SEARCH */}
-          <div className="relative flex-1 min-w-[180px] max-w-sm">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
             <input
               type="text"
@@ -161,55 +142,76 @@ export default function PermitPipelinePage() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded text-sm focus:border-red-600 focus:outline-none"
+              className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded text-xs focus:border-red-600 focus:outline-none bg-white"
             />
           </div>
 
-          {/* STATUS FILTER */}
-          <select
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-3 py-1.5 border border-gray-300 rounded text-xs font-bold bg-white text-gray-800 focus:border-red-600 focus:outline-none"
-          >
-            <option value="all">All Statuses ({permits.length})</option>
-            <option value="new">New ({permits.filter((p) => p.status === "new").length})</option>
-            <option value="contacted">
-              Contacted ({permits.filter((p) => p.status === "contacted").length})
-            </option>
-            <option value="quoted">
-              Quoted ({permits.filter((p) => p.status === "quoted").length})
-            </option>
-          </select>
-
-          {/* CITY FILTER */}
-          <select
-            value={cityFilter}
-            onChange={(e) => {
-              setCityFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-3 py-1.5 border border-gray-300 rounded text-xs font-bold bg-white text-gray-800 focus:border-red-600 focus:outline-none"
-          >
-            <option value="all">All Valley Cities</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
+          {/* STATUS & CITY FILTERS */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-2.5 py-1.5 border border-gray-300 rounded text-xs font-bold bg-white text-gray-800 focus:border-red-600 focus:outline-none truncate cursor-pointer"
+            >
+              <option value="all">All Statuses ({permits.length})</option>
+              <option value="new">New ({permits.filter((p) => p.status === "new").length})</option>
+              <option value="contacted">
+                Contacted ({permits.filter((p) => p.status === "contacted").length})
               </option>
-            ))}
-          </select>
+              <option value="quoted">
+                Quoted ({permits.filter((p) => p.status === "quoted").length})
+              </option>
+            </select>
+
+            <select
+              value={cityFilter}
+              onChange={(e) => {
+                setCityFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-2.5 py-1.5 border border-gray-300 rounded text-xs font-bold bg-white text-gray-800 focus:border-red-600 focus:outline-none truncate cursor-pointer"
+            >
+              <option value="all">All Valley Cities</option>
+              {cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* SHOW ENTRIES SELECTOR */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
+            <span>Show</span>
+            <select
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-2 py-1 border border-gray-300 rounded font-bold bg-white text-gray-900 focus:border-red-600 focus:outline-none text-xs cursor-pointer"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>entries</span>
+          </div>
         </div>
 
-        <span className="text-xs font-bold text-gray-500">
+        <span className="text-xs font-bold text-gray-500 hidden sm:inline">
           Showing {filteredPermits.length} of {permits.length} Permits
         </span>
       </div>
 
       {/* SCALABLE COUNTY PERMITS DATA TABLE */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* DESKTOP TABLE */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse">
             <thead className="bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
               <tr>
@@ -283,7 +285,7 @@ export default function PermitPipelinePage() {
                   {/* MATCH SCORE */}
                   <td className="py-3.5 px-4 text-center whitespace-nowrap">
                     <span className="bg-yellow-500 text-gray-950 font-bold text-xs px-2.5 py-1 rounded inline-flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 stroke-[2.5]" />
+                      <Zap className="w-3 h-3 fill-gray-950" />
                       <span>{permit.matchScore}%</span>
                     </span>
                   </td>
@@ -295,13 +297,12 @@ export default function PermitPipelinePage() {
                       onChange={(e) =>
                         handleStatusChange(permit.id, e.target.value as PermitLead["status"])
                       }
-                      className={`text-xs font-bold px-2 py-1 rounded border focus:outline-none cursor-pointer ${
-                        permit.status === "new"
+                      className={`text-xs font-bold px-2 py-1 rounded border focus:outline-none cursor-pointer ${permit.status === "new"
                           ? "bg-yellow-100 text-yellow-900 border-yellow-400"
                           : permit.status === "contacted"
-                          ? "bg-red-50 text-red-800 border-red-300"
-                          : "bg-emerald-100 text-emerald-900 border-emerald-400"
-                      }`}
+                            ? "bg-red-50 text-red-800 border-red-300"
+                            : "bg-emerald-100 text-emerald-900 border-emerald-400"
+                        }`}
                     >
                       <option value="new">New</option>
                       <option value="contacted">Contacted</option>
@@ -314,14 +315,14 @@ export default function PermitPipelinePage() {
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => setSelectedPermit(permit)}
-                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors shadow-xs"
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors shadow-xs cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>AI Pitch</span>
                       </button>
                       <button
                         onClick={() => handleCopy(permit.id, permit.aiPitchDraft)}
-                        className="p-1.5 rounded border border-gray-300 hover:bg-gray-100 text-gray-700 transition-colors"
+                        className="p-1.5 rounded border border-gray-300 hover:bg-gray-100 text-gray-700 transition-colors cursor-pointer"
                         title="Copy AI Pitch"
                       >
                         {copiedId === permit.id ? (
@@ -346,38 +347,141 @@ export default function PermitPipelinePage() {
           </table>
         </div>
 
+        {/* MOBILE CARDS VIEW (NO SWIPING) */}
+        <div className="md:hidden divide-y divide-gray-200">
+          {displayedPermits.map((permit) => (
+            <div key={permit.id} className="p-3.5 space-y-2.5 bg-white hover:bg-yellow-50/30 transition-colors">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-gray-500 text-xs">{permit.permitNumber}</span>
+                    <span className="text-[10px] text-gray-400 font-medium">Issued {permit.issuedDate}</span>
+                  </div>
+                  <div className="font-black text-gray-950 text-sm truncate mt-0.5">{permit.contractorName}</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="bg-yellow-500 text-gray-950 font-bold text-xs px-2 py-0.5 rounded inline-flex items-center gap-1">
+                    <Zap className="w-3 h-3 fill-gray-950" />
+                    <span>{permit.matchScore}% Match</span>
+                  </span>
+                  <div className="mt-1">
+                    <select
+                      value={permit.status}
+                      onChange={(e) =>
+                        handleStatusChange(permit.id, e.target.value as PermitLead["status"])
+                      }
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded border focus:outline-none cursor-pointer ${permit.status === "new"
+                          ? "bg-yellow-100 text-yellow-900 border-yellow-400"
+                          : permit.status === "contacted"
+                            ? "bg-red-50 text-red-800 border-red-300"
+                            : "bg-emerald-100 text-emerald-900 border-emerald-400"
+                        }`}
+                    >
+                      <option value="new">New</option>
+                      <option value="contacted">Contacted</option>
+                      <option value="quoted">Quoted</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-2.5 rounded border border-gray-100 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 font-medium">Recommended:</span>
+                  <span className="font-bold text-red-700 text-right truncate max-w-[200px]">
+                    {permit.recommendedEquipment}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 font-medium">Valuation:</span>
+                  <span className="font-black text-gray-950">{permit.valuation}</span>
+                </div>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-gray-500 font-medium shrink-0">Scope:</span>
+                  <span className="text-gray-700 line-clamp-2 text-right">{permit.projectType}</span>
+                </div>
+                <div className="flex items-start justify-between gap-2 pt-1 border-t border-gray-200/60">
+                  <span className="text-gray-500 font-medium shrink-0">Jobsite:</span>
+                  <span className="text-gray-600 truncate text-right">
+                    {permit.city}, AZ • {permit.jobsiteAddress}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-0.5 text-xs">
+                <a
+                  href={`tel:${permit.phone}`}
+                  className="font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>{permit.phone}</span>
+                </a>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setSelectedPermit(permit)}
+                    className="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors cursor-pointer shadow-xs"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>AI Pitch</span>
+                  </button>
+                  <button
+                    onClick={() => handleCopy(permit.id, permit.aiPitchDraft)}
+                    className="p-1.5 rounded border border-gray-300 hover:bg-gray-100 text-gray-700 transition-colors cursor-pointer"
+                    title="Copy AI Pitch"
+                  >
+                    {copiedId === permit.id ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {displayedPermits.length === 0 && (
+            <div className="py-8 text-center text-gray-400 font-medium text-sm">
+              No permits found matching criteria.
+            </div>
+          )}
+        </div>
+
         {/* PAGINATION CONTROLS */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
-          <span className="text-gray-600 font-medium">
+        <div className="p-4 border-t border-gray-200 bg-gray-50/80 flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:justify-between">
+          <span className="text-xs font-semibold text-gray-600 order-2 sm:order-1">
             Showing{" "}
-            <strong className="text-gray-900">
-              {filteredPermits.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}-
+            <strong className="text-gray-950 font-bold">
+              {filteredPermits.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}
+            </strong>{" "}
+            to{" "}
+            <strong className="text-gray-950 font-bold">
               {Math.min(currentPage * rowsPerPage, filteredPermits.length)}
             </strong>{" "}
-            of <strong className="text-gray-900">{filteredPermits.length}</strong> county permits
+            of <strong className="text-gray-950 font-bold">{filteredPermits.length}</strong> county permits
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 bg-white p-1 rounded-lg border border-gray-300 shadow-2xs order-1 sm:order-2">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 text-xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Prev</span>
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Previous</span>
             </button>
 
-            <span className="text-xs font-bold text-gray-700 px-2">
-              Page {currentPage} of {totalPages}
+            <span className="px-3 py-1 rounded-md bg-gray-100 text-gray-950 font-black text-xs min-w-[85px] text-center">
+              Page {currentPage} of {totalPages || 1}
             </span>
 
             <button
               disabled={currentPage >= totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 text-xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
             >
               <span>Next</span>
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -390,7 +494,7 @@ export default function PermitPipelinePage() {
             {/* MODAL HEADER */}
             <div className="bg-red-600 px-5 py-3.5 flex items-center justify-between text-white border-b-2 border-yellow-500">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-yellow-300" />
+                <Zap className="w-4 h-4 fill-yellow-300 text-yellow-300" />
                 <h3 className="font-bold text-sm tracking-wide">
                   AI Lead Pitch: {selectedPermit.contractorName}
                 </h3>

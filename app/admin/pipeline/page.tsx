@@ -243,29 +243,10 @@ export default function LeadPipelinePage() {
       </div>
 
       {/* TOOLBAR: SEARCH, FILTERS & VIEW TOGGLE */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
-        <div className="flex flex-wrap items-center gap-2 flex-1">
-          {/* SHOW ENTRIES SELECTOR (DEFAULT 10) */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
-            <span>Show</span>
-            <select
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="px-2 py-1.5 border border-gray-300 rounded font-bold bg-white text-gray-900 focus:border-red-600 focus:outline-none text-xs"
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-            <span>entries</span>
-          </div>
-
+      <div className="bg-white p-3.5 rounded-lg border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 flex-1">
           {/* SEARCH */}
-          <div className="relative flex-1 min-w-[180px] max-w-sm">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
             <input
               type="text"
@@ -275,52 +256,72 @@ export default function LeadPipelinePage() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded text-sm focus:border-red-600 focus:outline-none"
+              className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded text-xs focus:border-red-600 focus:outline-none bg-white"
             />
           </div>
 
-          {/* STAGE FILTER */}
-          <select
-            value={selectedStage}
-            onChange={(e) => {
-              setSelectedStage(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-3 py-1.5 border border-gray-300 rounded text-xs font-bold bg-white text-gray-800 focus:border-red-600 focus:outline-none"
-          >
-            <option value="all">All Stages ({leads.length})</option>
-            <option value="inquired">Inquired</option>
-            <option value="quoted">Quoted</option>
-            <option value="agreement_sent">Agreement Sent</option>
-            <option value="reserved">Reserved</option>
-            <option value="active">Active On Site</option>
-            <option value="closed">Closed / Returned</option>
-          </select>
+          {/* STAGE & MACHINE FILTERS */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+            <select
+              value={selectedStage}
+              onChange={(e) => {
+                setSelectedStage(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-2.5 py-1.5 border border-gray-300 rounded text-xs font-bold bg-white text-gray-800 focus:border-red-600 focus:outline-none truncate cursor-pointer"
+            >
+              <option value="all">All Stages ({leads.length})</option>
+              <option value="inquired">Inquired</option>
+              <option value="quoted">Quoted</option>
+              <option value="agreement_sent">Agreement Sent</option>
+              <option value="reserved">Reserved</option>
+              <option value="active">Active On Site</option>
+              <option value="closed">Closed / Returned</option>
+            </select>
 
-          {/* MACHINE FILTER */}
-          <select
-            value={selectedMachine}
-            onChange={(e) => {
-              setSelectedMachine(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="px-3 py-1.5 border border-gray-300 rounded text-xs font-bold bg-white text-gray-800 focus:border-red-600 focus:outline-none"
-          >
-            <option value="all">All Fleet Equipment</option>
-            {FLEET.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.name}
-              </option>
-            ))}
-          </select>
+            <select
+              value={selectedMachine}
+              onChange={(e) => {
+                setSelectedMachine(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-2.5 py-1.5 border border-gray-300 rounded text-xs font-bold bg-white text-gray-800 focus:border-red-600 focus:outline-none truncate cursor-pointer"
+            >
+              <option value="all">All Fleet Equipment</option>
+              {FLEET.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* SHOW ENTRIES SELECTOR */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
+            <span>Show</span>
+            <select
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-2 py-1 border border-gray-300 rounded font-bold bg-white text-gray-900 focus:border-red-600 focus:outline-none text-xs cursor-pointer"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>entries</span>
+          </div>
         </div>
 
         {/* VIEW TOGGLE */}
-        <div className="flex items-center gap-2">
-          <div className="inline-flex rounded border border-gray-300 bg-gray-50 p-0.5">
+        <div className="flex items-center justify-end sm:justify-start gap-2 pt-1 md:pt-0 border-t md:border-t-0 border-gray-100">
+          <div className="inline-flex rounded border border-gray-300 bg-gray-50 p-0.5 w-full sm:w-auto justify-center">
             <button
               onClick={() => setViewMode("table")}
-              className={`px-3 py-1 text-xs font-bold rounded flex items-center gap-1.5 transition-colors ${
+              className={`flex-1 sm:flex-initial px-3 py-1 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                 viewMode === "table"
                   ? "bg-red-600 text-white shadow-xs"
                   : "text-gray-700 hover:text-gray-900"
@@ -331,7 +332,7 @@ export default function LeadPipelinePage() {
             </button>
             <button
               onClick={() => setViewMode("kanban")}
-              className={`px-3 py-1 text-xs font-bold rounded flex items-center gap-1.5 transition-colors ${
+              className={`flex-1 sm:flex-initial px-3 py-1 text-xs font-bold rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                 viewMode === "kanban"
                   ? "bg-red-600 text-white shadow-xs"
                   : "text-gray-700 hover:text-gray-900"
@@ -347,7 +348,8 @@ export default function LeadPipelinePage() {
       {/* VIEW MODE 1: SCALABLE PIPELINE DATA TABLE */}
       {viewMode === "table" ? (
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+          {/* DESKTOP TABLE */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm text-left border-collapse">
               <thead className="bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
                 <tr>
@@ -442,13 +444,12 @@ export default function LeadPipelinePage() {
                       {/* PRIORITY */}
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <span
-                          className={`text-xs font-bold uppercase px-2 py-0.5 rounded border ${
-                            lead.priority === "urgent"
+                          className={`text-xs font-bold uppercase px-2 py-0.5 rounded border ${lead.priority === "urgent"
                               ? "bg-red-100 text-red-800 border-red-300"
                               : lead.priority === "high"
-                              ? "bg-yellow-100 text-yellow-900 border-yellow-300"
-                              : "bg-gray-100 text-gray-700 border-gray-300"
-                          }`}
+                                ? "bg-yellow-100 text-yellow-900 border-yellow-300"
+                                : "bg-gray-100 text-gray-700 border-gray-300"
+                            }`}
                         >
                           {lead.priority}
                         </span>
@@ -460,7 +461,7 @@ export default function LeadPipelinePage() {
                           <button
                             onClick={() => moveLead(lead.id, "prev")}
                             disabled={lead.stage === "inquired"}
-                            className="p-1.5 rounded border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-1.5 rounded border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                             title="Move to previous stage"
                           >
                             <ChevronLeft className="w-4 h-4" />
@@ -468,7 +469,7 @@ export default function LeadPipelinePage() {
                           <button
                             onClick={() => moveLead(lead.id, "next")}
                             disabled={lead.stage === "closed"}
-                            className="p-1.5 rounded bg-red-600 hover:bg-red-700 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            className="p-1.5 rounded bg-red-600 hover:bg-red-700 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                             title="Advance to next stage"
                           >
                             <ChevronRight className="w-4 h-4" />
@@ -490,38 +491,149 @@ export default function LeadPipelinePage() {
             </table>
           </div>
 
+          {/* MOBILE CARDS VIEW (NO SWIPING) */}
+          <div className="md:hidden divide-y divide-gray-200">
+            {displayedLeads.map((lead) => {
+              const stageInfo = stageLabels[lead.stage];
+              return (
+                <div key={lead.id} className="p-3.5 space-y-2.5 bg-white hover:bg-yellow-50/30 transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-gray-500 text-xs">{lead.id}</span>
+                        <span
+                          className={`text-[10px] font-bold uppercase px-1.5 py-0.2 rounded border ${lead.priority === "urgent"
+                              ? "bg-red-100 text-red-800 border-red-300"
+                              : lead.priority === "high"
+                                ? "bg-yellow-100 text-yellow-900 border-yellow-300"
+                                : "bg-gray-100 text-gray-700 border-gray-300"
+                            }`}
+                        >
+                          {lead.priority}
+                        </span>
+                      </div>
+                      <div className="font-black text-gray-950 text-sm truncate mt-0.5">{lead.customerName}</div>
+                      {lead.companyName && (
+                        <div className="text-xs text-gray-500 font-medium truncate">{lead.companyName}</div>
+                      )}
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-black text-gray-950 text-base leading-none">
+                        ${lead.quotedAmount.toLocaleString()}
+                      </div>
+                      <div className="mt-1">
+                        <select
+                          value={lead.stage}
+                          onChange={(e) =>
+                            setLeadStage(lead.id, e.target.value as PipelineLead["stage"])
+                          }
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded border focus:outline-none cursor-pointer ${stageInfo.bg} ${stageInfo.text}`}
+                        >
+                          <option value="inquired">Inquired</option>
+                          <option value="quoted">Quoted</option>
+                          <option value="agreement_sent">Agreement Sent</option>
+                          <option value="reserved">Reserved</option>
+                          <option value="active">Active On Site</option>
+                          <option value="closed">Closed / Returned</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-2.5 rounded border border-gray-100 space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-500 font-medium">Machine:</span>
+                      <span className="font-bold text-gray-900 text-right truncate max-w-[200px]">
+                        {lead.equipmentName}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-500 font-medium">Dates:</span>
+                      <span className="text-gray-800 font-semibold">
+                        {lead.startDate} → {lead.endDate}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-gray-500 font-medium shrink-0">Location:</span>
+                      <span className="text-gray-600 truncate max-w-[200px] text-right">
+                        {lead.jobsiteAddress}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-0.5 text-xs">
+                    <a
+                      href={`tel:${lead.phone}`}
+                      className="font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{lead.phone}</span>
+                    </a>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => moveLead(lead.id, "prev")}
+                        disabled={lead.stage === "inquired"}
+                        className="px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-0.5 cursor-pointer"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                        <span>Prev</span>
+                      </button>
+                      <button
+                        onClick={() => moveLead(lead.id, "next")}
+                        disabled={lead.stage === "closed"}
+                        className="px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-0.5 cursor-pointer"
+                      >
+                        <span>Next</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {displayedLeads.length === 0 && (
+              <div className="py-8 text-center text-gray-400 font-medium text-sm">
+                No contractor leads found matching criteria.
+              </div>
+            )}
+          </div>
+
           {/* PAGINATION CONTROLS */}
-          <div className="p-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
-            <span className="text-gray-600 font-medium">
+          <div className="p-4 border-t border-gray-200 bg-gray-50/80 flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:justify-between">
+            <span className="text-xs font-semibold text-gray-600 order-2 sm:order-1">
               Showing{" "}
-              <strong className="text-gray-900">
-                {filteredLeads.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}-
+              <strong className="text-gray-950 font-bold">
+                {filteredLeads.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}
+              </strong>{" "}
+              to{" "}
+              <strong className="text-gray-950 font-bold">
                 {Math.min(currentPage * rowsPerPage, filteredLeads.length)}
               </strong>{" "}
-              of <strong className="text-gray-900">{filteredLeads.length}</strong> leads
+              of <strong className="text-gray-950 font-bold">{filteredLeads.length}</strong> leads
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="inline-flex items-center gap-1.5 bg-white p-1 rounded-lg border border-gray-300 shadow-2xs order-1 sm:order-2">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 text-xs"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
               >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Prev</span>
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Previous</span>
               </button>
 
-              <span className="text-xs font-bold text-gray-700 px-2">
-                Page {currentPage} of {totalPages}
+              <span className="px-3 py-1 rounded-md bg-gray-100 text-gray-950 font-black text-xs min-w-[85px] text-center">
+                Page {currentPage} of {totalPages || 1}
               </span>
 
               <button
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 text-xs"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md font-bold text-xs transition-all bg-white hover:bg-gray-100 text-gray-800 disabled:opacity-30 disabled:hover:bg-white disabled:cursor-not-allowed active:scale-95 cursor-pointer"
               >
                 <span>Next</span>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -572,13 +684,12 @@ export default function LeadPipelinePage() {
                             )}
                           </div>
                           <span
-                            className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded ${
-                              lead.priority === "urgent"
+                            className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded ${lead.priority === "urgent"
                                 ? "bg-red-600 text-white"
                                 : lead.priority === "high"
-                                ? "bg-yellow-100 text-yellow-900 border border-yellow-300"
-                                : "bg-gray-200 text-gray-700"
-                            }`}
+                                  ? "bg-yellow-100 text-yellow-900 border border-yellow-300"
+                                  : "bg-gray-200 text-gray-700"
+                              }`}
                           >
                             {lead.priority}
                           </span>
